@@ -1,6 +1,6 @@
 module transmit_fsm (
   input  logic pclk,
-	input  logic presetn,
+  input  logic presetn,
   input  logic utrst,
   input  logic thre,
   input  logic shift_cnt_eq,
