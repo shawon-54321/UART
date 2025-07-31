@@ -1,0 +1,63 @@
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "apb_interface_apb_fsm_0_1",
+    "cell_name": "apb_fsm_0",
+    "component_reference": "xilinx.com:module_ref:apb_fsm:1.0",
+    "ip_revision": "1",
+    "gen_directory": "../../../../../../axi_apb_multi_master.gen/sources_1/bd/apb_interface/ip/apb_interface_apb_fsm_0_1",
+    "parameters": {
+      "component_parameters": {
+        "IDLE": [ { "value": "\"0\"", "resolve_type": "user", "format": "bitString", "usage": "all" } ],
+        "ACCESS": [ { "value": "\"1\"", "resolve_type": "user", "format": "bitString", "usage": "all" } ],
+        "Component_Name": [ { "value": "apb_interface_apb_fsm_0_1", "resolve_type": "user", "usage": "all" } ]
+      },
+      "model_parameters": {
+        "IDLE": [ { "value": "\"0\"", "resolve_type": "generated", "format": "bitString", "usage": "all" } ],
+        "ACCESS": [ { "value": "\"1\"", "resolve_type": "generated", "format": "bitString", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "zynquplus" } ],
+        "BASE_BOARD_PART": [ { "value": "xilinx.com:zcu104:part0:1.1" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xczu7ev" } ],
+        "PACKAGE": [ { "value": "ffvc1156" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "E" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "1" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "../../../../../../axi_apb_multi_master.gen/sources_1/bd/apb_interface/ip/apb_interface_apb_fsm_0_1" } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "../../ipshared" } ],
+        "SWVERSION": [ { "value": "2025.1" } ],
+        "SYNTHESISFLOW": [ { "value": "OOC_HIERARCHICAL" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "pclk": [ { "direction": "in" } ],
+        "presetn": [ { "direction": "in" } ],
+        "psel": [ { "direction": "in" } ],
+        "penable": [ { "direction": "in" } ],
+        "pwrite": [ { "direction": "in" } ],
+        "pwdata": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "paddr": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "pready": [ { "direction": "out" } ],
+        "pslverr": [ { "direction": "out" } ],
+        "data_2s": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
+        "data_2m": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "add": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
+        "wr_en": [ { "direction": "out" } ],
+        "rd_en": [ { "direction": "out" } ],
+        "prdata": [ { "direction": "in", "size_left": "31", "size_right": "0" } ]
+      }
+    }
+  }
+}

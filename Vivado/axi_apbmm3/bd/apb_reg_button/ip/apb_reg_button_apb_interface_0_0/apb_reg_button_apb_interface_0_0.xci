@@ -1,0 +1,74 @@
+{
+  "schema": "xilinx.com:schema:json_instance:1.0",
+  "ip_inst": {
+    "xci_name": "apb_reg_button_apb_interface_0_0",
+    "cell_name": "apb_interface_0",
+    "component_reference": "xilinx.com:user:apb_interface:1.0",
+    "ip_revision": "2",
+    "gen_directory": "../../../../../../axi_apb_multi_master.gen/sources_1/bd/apb_reg_button/ip/apb_reg_button_apb_interface_0_0",
+    "parameters": {
+      "component_parameters": {
+        "Component_Name": [ { "value": "apb_reg_button_apb_interface_0_0", "resolve_type": "user", "usage": "all" } ]
+      },
+      "project_parameters": {
+        "ARCHITECTURE": [ { "value": "zynquplus" } ],
+        "BASE_BOARD_PART": [ { "value": "xilinx.com:zcu104:part0:1.1" } ],
+        "BOARD_CONNECTIONS": [ { "value": "" } ],
+        "DEVICE": [ { "value": "xczu7ev" } ],
+        "PACKAGE": [ { "value": "ffvc1156" } ],
+        "PREFHDL": [ { "value": "VERILOG" } ],
+        "SILICON_REVISION": [ { "value": "" } ],
+        "SIMULATOR_LANGUAGE": [ { "value": "MIXED" } ],
+        "SPEEDGRADE": [ { "value": "-2" } ],
+        "STATIC_POWER": [ { "value": "" } ],
+        "TEMPERATURE_GRADE": [ { "value": "E" } ]
+      },
+      "runtime_parameters": {
+        "IPCONTEXT": [ { "value": "IP_Integrator" } ],
+        "IPREVISION": [ { "value": "2" } ],
+        "MANAGED": [ { "value": "TRUE" } ],
+        "OUTPUTDIR": [ { "value": "../../../../../../axi_apb_multi_master.gen/sources_1/bd/apb_reg_button/ip/apb_reg_button_apb_interface_0_0" } ],
+        "SELECTEDSIMMODEL": [ { "value": "" } ],
+        "SHAREDDIR": [ { "value": "../../ipshared" } ],
+        "SWVERSION": [ { "value": "2025.1" } ],
+        "SYNTHESISFLOW": [ { "value": "OUT_OF_CONTEXT" } ]
+      }
+    },
+    "boundary": {
+      "ports": {
+        "add_0": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
+        "data_2m_0": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "data_2s_0": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
+        "paddr_0": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "pclk_0": [ { "direction": "in" } ],
+        "penable_0": [ { "direction": "in" } ],
+        "prdata_0": [ { "direction": "in", "size_left": "31", "size_right": "0" } ],
+        "pready_0": [ { "direction": "out" } ],
+        "presetn_0": [ { "direction": "in" } ],
+        "psel_0": [ { "direction": "in" } ],
+        "pslverr_0": [ { "direction": "out" } ],
+        "pwdata_0": [ { "direction": "out", "size_left": "31", "size_right": "0" } ],
+        "pwrite_0": [ { "direction": "in" } ],
+        "rd_en_0": [ { "direction": "out" } ],
+        "wr_en_0": [ { "direction": "out" } ]
+      },
+      "interfaces": {
+        "apb_interface": {
+          "vlnv": "xilinx.com:interface:apb:1.0",
+          "abstraction_type": "xilinx.com:interface:apb_rtl:1.0",
+          "mode": "slave",
+          "port_maps": {
+            "PSLVERR": [ { "physical_name": "pslverr_0" } ],
+            "PADDR": [ { "physical_name": "add_0" } ],
+            "PREADY": [ { "physical_name": "pready_0" } ],
+            "PENABLE": [ { "physical_name": "penable_0" } ],
+            "PWRITE": [ { "physical_name": "pwrite_0" } ],
+            "PRDATA": [ { "physical_name": "data_2m_0" } ],
+            "PWDATA": [ { "physical_name": "data_2s_0" } ],
+            "PSEL": [ { "physical_name": "psel_0" } ]
+          }
+        }
+      }
+    }
+  }
+}

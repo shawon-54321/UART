@@ -1,0 +1,242 @@
+{
+  "design": {
+    "design_info": {
+      "boundary_crc": "0x8C2933F38C2933F3",
+      "device": "xczu7ev-ffvc1156-2-e",
+      "gen_directory": "../../../../axi_apb_multi_master.gen/sources_1/bd/apb_interface",
+      "name": "apb_interface",
+      "rev_ctrl_bd_flag": "RevCtrlBdOff",
+      "synth_flow_mode": "Hierarchical",
+      "tool_version": "2025.1",
+      "validated": "true"
+    },
+    "design_tree": {
+      "apb_fsm_0": ""
+    },
+    "ports": {
+      "add_0": {
+        "direction": "I",
+        "left": "31",
+        "right": "0"
+      },
+      "data_2m_0": {
+        "direction": "O",
+        "left": "31",
+        "right": "0"
+      },
+      "data_2s_0": {
+        "direction": "I",
+        "left": "31",
+        "right": "0"
+      },
+      "paddr_0": {
+        "direction": "O",
+        "left": "31",
+        "right": "0"
+      },
+      "pclk_0": {
+        "direction": "I"
+      },
+      "penable_0": {
+        "direction": "I"
+      },
+      "prdata_0": {
+        "direction": "I",
+        "left": "31",
+        "right": "0"
+      },
+      "pready_0": {
+        "direction": "O"
+      },
+      "presetn_0": {
+        "direction": "I"
+      },
+      "psel_0": {
+        "direction": "I"
+      },
+      "pslverr_0": {
+        "direction": "O"
+      },
+      "pwdata_0": {
+        "direction": "O",
+        "left": "31",
+        "right": "0"
+      },
+      "pwrite_0": {
+        "direction": "I"
+      },
+      "rd_en_0": {
+        "direction": "O"
+      },
+      "wr_en_0": {
+        "direction": "O"
+      }
+    },
+    "components": {
+      "apb_fsm_0": {
+        "vlnv": "xilinx.com:module_ref:apb_fsm:1.0",
+        "ip_revision": "1",
+        "xci_name": "apb_interface_apb_fsm_0_1",
+        "xci_path": "ip\\apb_interface_apb_fsm_0_1\\apb_interface_apb_fsm_0_1.xci",
+        "inst_hier_path": "apb_fsm_0",
+        "has_run_ip_tcl": "true",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "apb_fsm",
+          "boundary_crc": "0x0"
+        },
+        "ports": {
+          "pclk": {
+            "direction": "I"
+          },
+          "presetn": {
+            "direction": "I"
+          },
+          "psel": {
+            "direction": "I"
+          },
+          "penable": {
+            "direction": "I"
+          },
+          "pwrite": {
+            "direction": "I"
+          },
+          "pwdata": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "paddr": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "pready": {
+            "direction": "O"
+          },
+          "pslverr": {
+            "direction": "O"
+          },
+          "data_2s": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "data_2m": {
+            "direction": "O",
+            "left": "31",
+            "right": "0"
+          },
+          "add": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          },
+          "wr_en": {
+            "direction": "O"
+          },
+          "rd_en": {
+            "direction": "O"
+          },
+          "prdata": {
+            "direction": "I",
+            "left": "31",
+            "right": "0"
+          }
+        }
+      }
+    },
+    "nets": {
+      "add_0_1": {
+        "ports": [
+          "add_0",
+          "apb_fsm_0/add"
+        ]
+      },
+      "apb_fsm_0_data_2m": {
+        "ports": [
+          "apb_fsm_0/data_2m",
+          "data_2m_0"
+        ]
+      },
+      "apb_fsm_0_paddr": {
+        "ports": [
+          "apb_fsm_0/paddr",
+          "paddr_0"
+        ]
+      },
+      "apb_fsm_0_pready": {
+        "ports": [
+          "apb_fsm_0/pready",
+          "pready_0"
+        ]
+      },
+      "apb_fsm_0_pslverr": {
+        "ports": [
+          "apb_fsm_0/pslverr",
+          "pslverr_0"
+        ]
+      },
+      "apb_fsm_0_pwdata": {
+        "ports": [
+          "apb_fsm_0/pwdata",
+          "pwdata_0"
+        ]
+      },
+      "apb_fsm_0_rd_en": {
+        "ports": [
+          "apb_fsm_0/rd_en",
+          "rd_en_0"
+        ]
+      },
+      "apb_fsm_0_wr_en": {
+        "ports": [
+          "apb_fsm_0/wr_en",
+          "wr_en_0"
+        ]
+      },
+      "data_2s_0_1": {
+        "ports": [
+          "data_2s_0",
+          "apb_fsm_0/data_2s"
+        ]
+      },
+      "pclk_0_1": {
+        "ports": [
+          "pclk_0",
+          "apb_fsm_0/pclk"
+        ]
+      },
+      "penable_0_1": {
+        "ports": [
+          "penable_0",
+          "apb_fsm_0/penable"
+        ]
+      },
+      "prdata_0_1": {
+        "ports": [
+          "prdata_0",
+          "apb_fsm_0/prdata"
+        ]
+      },
+      "presetn_0_1": {
+        "ports": [
+          "presetn_0",
+          "apb_fsm_0/presetn"
+        ]
+      },
+      "psel_0_1": {
+        "ports": [
+          "psel_0",
+          "apb_fsm_0/psel"
+        ]
+      },
+      "pwrite_0_1": {
+        "ports": [
+          "pwrite_0",
+          "apb_fsm_0/pwrite"
+        ]
+      }
+    }
+  }
+}

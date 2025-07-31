@@ -1,0 +1,43 @@
+{
+   "ActiveEmotionalView":"Default View",
+   "Default View_ScaleFactor":"1.0",
+   "Default View_TopLeft":"-445,-108",
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.8.0 2024-04-26 e1825d835c VDI=44 GEI=38 GUI=JA:21.0
+#  -string -flagsOSRD
+preplace port port-id_pclk_0 -pg 1 -lvl 0 -x -20 -y 70 -defaultsOSRD
+preplace port port-id_penable_0 -pg 1 -lvl 0 -x -20 -y 130 -defaultsOSRD
+preplace port port-id_pready_0 -pg 1 -lvl 2 -x 350 -y 140 -defaultsOSRD
+preplace port port-id_presetn_0 -pg 1 -lvl 0 -x -20 -y 90 -defaultsOSRD
+preplace port port-id_psel_0 -pg 1 -lvl 0 -x -20 -y 110 -defaultsOSRD
+preplace port port-id_pslverr_0 -pg 1 -lvl 2 -x 350 -y 160 -defaultsOSRD
+preplace port port-id_pwrite_0 -pg 1 -lvl 0 -x -20 -y 150 -defaultsOSRD
+preplace port port-id_rd_en_0 -pg 1 -lvl 2 -x 350 -y 200 -defaultsOSRD
+preplace port port-id_wr_en_0 -pg 1 -lvl 2 -x 350 -y 180 -defaultsOSRD
+preplace portBus add_0 -pg 1 -lvl 0 -x -20 -y 190 -defaultsOSRD
+preplace portBus data_2m_0 -pg 1 -lvl 2 -x 350 -y 220 -defaultsOSRD
+preplace portBus data_2s_0 -pg 1 -lvl 0 -x -20 -y 170 -defaultsOSRD
+preplace portBus paddr_0 -pg 1 -lvl 2 -x 350 -y 120 -defaultsOSRD
+preplace portBus prdata_0 -pg 1 -lvl 0 -x -20 -y 210 -defaultsOSRD
+preplace portBus pwdata_0 -pg 1 -lvl 2 -x 350 -y 100 -defaultsOSRD
+preplace inst apb_fsm_0 -pg 1 -lvl 1 -x 140 -y 140 -defaultsOSRD
+preplace netloc add_0_1 1 0 1 NJ 190
+preplace netloc apb_fsm_0_data_2m 1 1 1 280J 160n
+preplace netloc data_2s_0_1 1 0 1 NJ 170
+preplace netloc apb_fsm_0_paddr 1 1 1 310J 100n
+preplace netloc pclk_0_1 1 0 1 NJ 70
+preplace netloc penable_0_1 1 0 1 NJ 130
+preplace netloc prdata_0_1 1 0 1 NJ 210
+preplace netloc apb_fsm_0_pready 1 1 1 300J 120n
+preplace netloc presetn_0_1 1 0 1 NJ 90
+preplace netloc psel_0_1 1 0 1 NJ 110
+preplace netloc apb_fsm_0_pslverr 1 1 1 290J 140n
+preplace netloc apb_fsm_0_pwdata 1 1 1 320J 80n
+preplace netloc pwrite_0_1 1 0 1 NJ 150
+preplace netloc apb_fsm_0_rd_en 1 1 1 NJ 200
+preplace netloc apb_fsm_0_wr_en 1 1 1 NJ 180
+levelinfo -pg 1 -20 140 350
+pagesize -pg 1 -db -bbox -sgen -180 0 510 270
+"
+}
+
