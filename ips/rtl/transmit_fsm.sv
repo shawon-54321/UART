@@ -46,7 +46,7 @@ module transmit_fsm (
 
   
   dff #(.RESET_VALUE(IDLE),
-	      .FLOP_WIDTH(STATE_WIDTH)
+	.FLOP_WIDTH(STATE_WIDTH)
   ) u_psr (
     .clk     ( pclk   ),
     .reset_b ( presetn),
