@@ -125,14 +125,17 @@ endmodule
 
 //4 to 1 \
 
-module mux4to1(
-  input logic [1:0]sel,
-  input logic in0,
-  input logic in1,
-  input logic in2,
-  input logic in3,
+module mux4to1#(
+  parameter LINE_WIDTH = 1
+	
+)(
+  input  logic [1:0]sel,
+  input  logic [LINE_WIDTH-1:0] in0,
+  input  logic [LINE_WIDTH-1:0] in1,
+  input  logic [LINE_WIDTH-1:0] in2,
+  input  logic [LINE_WIDTH-1:0] in3,
   
-  output logic out
+  output logic [LINE_WIDTH-1:0] out
 );
 
   always @(*) begin
@@ -514,7 +517,8 @@ endmodule
 
 module fifo_sync #( 
      parameter FIFO_DEPTH = 8,
-	   parameter DATA_WIDTH = 32
+	   parameter DATA_WIDTH = 32,
+	   parameter FIFO_DEPTH_LOG = 3
 	   )(
 	     input logic clk, 
        input logic rst_n,
@@ -529,7 +533,7 @@ module fifo_sync #(
 	    
 	   ); 
 
-  localparam FIFO_DEPTH_LOG = $clog2(FIFO_DEPTH);// 
+  ///localparam FIFO_DEPTH_LOG = $clog2(FIFO_DEPTH);// 
 	
     // Declare a by-dimensional array to store the data
   logic [DATA_WIDTH-1:0] fifo [0:FIFO_DEPTH-1];// depth 8 => [0:7] 32 bit elements
