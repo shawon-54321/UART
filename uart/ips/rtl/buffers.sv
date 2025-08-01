@@ -95,19 +95,7 @@ module buffers(
 
   );
   
-  /* 
- 
-  dff #(
-    .FLOP_WIDTH ( 8    ),
-    .RESET_VALUE( 8'b00000000 )
-  )u_thr(  
-    .clk     ( pclk     ),
-    .reset_b ( presetn  ),
-    .d       ( d_thr    ),
-    .q       ( thr      )
-  );  
-  
-   */
+
   
   always@(*) begin
     casez(fifoen) 
@@ -134,7 +122,7 @@ module buffers(
     .rst_n      ( presetn       ),
     .wr_en      ( rx_done & fifoen      ),
     .rd_en      ( wbr_rd_en & fifoen    ),
-    .data_in    ( rsr_data      ),
+    .data_in    ( rx_fifo_data_in      ),
     .clear      ( rxclr         ),
     
     .data_out   ( fifo_rbr      ),
@@ -172,17 +160,7 @@ module buffers(
   assign rx_fifo_full = rhr_full | fifo_rx_full;
   assign rx_fifo_empty = rhr_empty | fifo_rx_empty;
   
-  /*
-  dff #(
-    .FLOP_WIDTH ( 8    ),
-    .RESET_VALUE( 8'b00000000 )
-  )u_rhr(  
-    .clk     ( pclk     ),
-    .reset_b ( presetn  ),
-    .d       ( d_rhr    ),
-    .q       ( rhr      )
-  ); 
-  */
+
   
   always@(*) begin
     casez(fifoen) 
