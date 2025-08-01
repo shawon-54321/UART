@@ -125,14 +125,17 @@ endmodule
 
 //4 to 1 \
 
-module mux4to1(
-  input logic [1:0]sel,
-  input logic in0,
-  input logic in1,
-  input logic in2,
-  input logic in3,
+module mux4to1#(
+  parameter LINE_WIDTH = 1
+	
+)(
+  input  logic [1:0]sel,
+  input  logic [LINE_WIDTH-1:0] in0,
+  input  logic [LINE_WIDTH-1:0] in1,
+  input  logic [LINE_WIDTH-1:0] in2,
+  input  logic [LINE_WIDTH-1:0] in3,
   
-  output logic out
+  output logic [LINE_WIDTH-1:0] out
 );
 
   always @(*) begin
