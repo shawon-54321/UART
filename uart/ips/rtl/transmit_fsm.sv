@@ -29,10 +29,10 @@ module transmit_fsm (
   always @(*) begin : NSL
     case(pstate)
       IDLE     : nstate[STATE_WIDTH-1:0] = (utrst & ~thre)? START : IDLE ;
-      START    : nstate[STATE_WIDTH-1:0] = utrst? ((transmit_edge)? TRANSMIT : START) : IDLE;
-      TRANSMIT : nstate[STATE_WIDTH-1:0] = utrst? ((shift_cnt_eq)? (thre? (transmit_edge? IDLE : TRANSMIT) : (START)) : (data_cnt_eq & transmit_edge & pen)? PARITY : TRANSMIT) : IDLE ;
-      PARITY   : nstate[STATE_WIDTH-1:0] = utrst? (transmit_edge? TRANSMIT : PARITY) : IDLE; 
-      default  : nstate[STATE_WIDTH-1:0] = 2'bx ;`
+      START    : nstate[STATE_WIDTH-1:0] = (transmit_edge)? TRANSMIT : START;
+      TRANSMIT : nstate[STATE_WIDTH-1:0] = (shift_cnt_eq)? (thre? (transmit_edge? IDLE : TRANSMIT) : (START)) : (data_cnt_eq & transmit_edge & pen)? PARITY : TRANSMIT ;
+      PARITY   : nstate[STATE_WIDTH-1:0] = transmit_edge? TRANSMIT : PARITY; 
+      default  : nstate[STATE_WIDTH-1:0] = 2'bx ; 
     endcase
   end
   
