@@ -606,6 +606,71 @@ endmodule
 //--------------------------------------------------------------------------------------------------------------------
 
 
+// >>>>>>>>>>>>>>>>>>>>> COUNTER WITH ENABLE>>>>>>>>>>>>>>>>>>>>
+
+module counter_en #(
+  parameter COUNTER_WIDTH = 16
+)(
+  input logic                        clk,
+  input logic                        reset_b,
+  input logic                        counter_clear,
+  input logic                        en,
+  output logic [COUNTER_WIDTH-1 : 0] count
+);
+
+  always @(posedge clk or negedge reset_b) begin
+    if (~reset_b) begin
+      count[COUNTER_WIDTH -1 : 0] <= 'b0;
+    end
+    else begin
+      count[COUNTER_WIDTH -1 : 0] <= counter_clear ? 'b0 : (en ? (count [COUNTER_WIDTH -1 : 'b0] + 1'b1) : count);
+    end
+  end
+
+endmodule
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
+// Universal shift register
+
+//mode control          opeartion 
+//--------------------------------------
+//  00                   No Change
+//  01                   Shift Right
+//  10                   Shift Left
+//  11                   Parallel Load
+
+module universal_shift_reg #(
+  parameter DATA_WIDTH = 8
+)(
+  input  logic                      clk, 
+  input  logic                      rst, 
+  input  logic                [1:0] select,                        // select operation
+  input  logic [DATA_WIDTH - 1 : 0] p_din,                         // parallel data in 
+  input  logic                      s_left_din,                    // serial left data in
+  input  logic                      s_right_din,                   // serial right data in
+  output logic [DATA_WIDTH - 1 : 0] p_dout,                        // parallel data out
+  output logic                      s_left_dout,                   // serial left data out
+  output logic                      s_right_dout                   // serial right data out
+);
+  always@(posedge clk or negedge rst) begin
+    if(~ rst) begin
+      p_dout <= 'b0;
+    end
+    else begin
+      casez (select)
+        2'b00    : p_dout <= p_dout;                                    // No Chnage
+        2'b01    : p_dout <= {s_right_din,p_dout[DATA_WIDTH - 1 : 1]};  // Right Shift
+        2'b10    : p_dout <= {p_dout[DATA_WIDTH - 2 : 0], s_left_din};  // Left Shift
+        2'b11    : p_dout <= p_din;                                     // Parallel in - Parallel out
+        default  : p_dout <= 'bx; 
+      endcase
+    end
+  end
+  assign s_left_dout  = p_dout[0];
+  assign s_right_dout = p_dout[DATA_WIDTH - 1];
+endmodule
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

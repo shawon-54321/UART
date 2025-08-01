@@ -24,7 +24,7 @@ module uart_top (
     logic        wbr_rd_en;      
                  
     logic        fifoen;
-    logic        txclr
+    logic        txclr;
     logic        rxclr;
     logic [1:0]  rxfiftl;
                  
@@ -37,7 +37,8 @@ module uart_top (
     logic        rx_fifo_empty;
                  
     logic        below_level;
-
+    logic        frame_error;
+    logic        parity_error;
 
 
   buffers u_buffers (
@@ -45,12 +46,14 @@ module uart_top (
     .presetn       ( presetn      ),
     
     .rsr_data      ( rsr_data     ),
-    .wdata         ( wdata        ),
+    .pwdata         ( pwdata        ),
     
     .thr_wr_en     ( thr_wr_en    ),
     .rx_done       ( rx_done      ),
     .tsr_load      ( tsr_load     ),
     .wbr_rd_en     ( wbr_rd_en    ),
+    .frame_error     ( frame_error    ),
+    .parity_error     ( parity_error    ),
     
     .fifoen        ( fifoen       ),
     .txclr         ( txclr        ),
@@ -79,13 +82,12 @@ module uart_top (
     logic       eps;
     logic       sp;
                 
-    logic       frame_error;
-    logic       parity_error;
+
     logic       error_check;
 
 
   uart_receiver_top u_uart_receive_top (
-    .pckl         ( pckl        ),
+    .pclk         ( pclk        ),
     .presetn      ( presetn     ),
     .utrrst       ( urrst       ),
     .sample_edge  ( sample_edge ),
@@ -118,6 +120,7 @@ module uart_top (
     .presetn          ( presetn         ),
     .utrst            ( utrst           ),
     .thre             ( thre            ),
+    .pen (pen), 
     .eps              ( eps             ),
     .sp               ( sp              ),
     .stb              ( stb             ),
@@ -166,7 +169,9 @@ module uart_top (
     .error_check   ( error_check  ),
     .shift_cnt_eq  ( shift_cnt_eq ),
     .rx_fifo_empty ( rx_fifo_empty),
+    .tx_fifo_empty ( tx_fifo_empty),
     .tsr_load      ( tsr_load     ),
+    .receive_done (receive_done),
     
     .loop          ( loop         ),
     .thr_wr_en     ( thr_wr_en    ),
@@ -176,7 +181,7 @@ module uart_top (
     .rxclr         ( rxclr        ),
     .fifoen        ( fifoen       ),
     .sp            ( sp           ),
-    .esp           ( esp          ),
+    .eps           ( eps          ),
     .pen           ( pen          ),
     .stb           ( stb          ),
     .wls           ( wls          ),

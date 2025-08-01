@@ -1,10 +1,10 @@
 module uart_receiver_top (
-  input  logic       pckl,
+  input  logic       pclk,
   input  logic       presetn,
   input  logic       utrrst,
   input  logic       sample_edge,
   input  logic       receive_done,
-  input  logic       uartn_rxd,
+  input  logic       uart_rxd,
   input  logic       loop_txd,
   input  logic       loop,
   input  logic [1:0] wls,
@@ -38,7 +38,7 @@ module uart_receiver_top (
     .pclk                        ( pclk                       ),
     .presetn                     ( presetn                    ),
     .utrrst                      ( utrrst                     ),
-    .uartn_rxd                   ( uartn_rxd                  ),
+    .uart_rxd                    ( uart_rxd                   ),
     .sample_edge                 ( sample_edge                ),
     .receive_done                ( receive_done               ),
     
@@ -59,10 +59,10 @@ module uart_receiver_top (
   );
 
   uart_receiver_shift_block u_uart_receiver_shift_block (
-    .pckl             ( pckl            ),
+    .pclk             ( pclk            ),
     .presetn          ( presetn         ),
     .receive_shift_en ( receive_shift_en),
-    .uartn_rxd        ( uartn_rxd       ),
+    .uart_rxd         ( uart_rxd        ),
     .error_check      ( error_check     ),
     .loop_txd         ( loop_txd        ),
     .loop             ( loop            ),

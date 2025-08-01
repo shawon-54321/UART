@@ -1,0 +1,70 @@
+module tb_uart_top;
+
+  logic pclk = 0;
+  logic presetn;
+  logic psel;
+  logic penable;
+  logic pwrite;
+  logic [31:0] paddr;
+  logic [31:0] pwdata;
+  
+  logic uart_rxd;
+  
+  logic pready;
+  logic [31:0] prdata;
+  
+  logic uart_tx;
+
+  always #5 pclk = ~ pclk;
+
+  uart_top u_uart_top (
+   .pclk       ( pclk       ),
+   .presetn    ( presetn    ),
+   .psel       ( psel       ),
+   .penable    ( penable    ),
+   .pwrite     ( pwrite     ),
+   .paddr      ( paddr      ),
+   .pwdata     ( pwdata     ),
+   
+   .uart_rxd   ( uart_rxd   ),
+   
+   .pready     ( pready     ),
+   .prdata     ( prdata     ),
+   
+   .uart_tx    ( uart_tx    ),
+   .uart_intpt ( uart_intpt )
+  );
+
+
+  //..............reset...................
+  task reset;
+    presetn = 1'b0;
+    @(posedge pclk);
+    presetn = 1'b1;
+  endtask
+  //......................................
+
+
+  initial begin
+
+    presetn  = 0;
+    psel     = 0;
+    penable  = 0;
+    pwrite   = 0;
+    paddr    = 32'h0;
+    pwdata   = 32'h0;
+    uart_rxd = 1;
+    repeat(4) @(posedge pclk);
+    reset;
+
+    repeat(40) @(posedge pclk);
+
+
+
+    #100;
+
+
+    $finish;
+  end
+
+endmodule

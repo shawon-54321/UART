@@ -3,12 +3,14 @@ module buffers(
   inout logic presetn,
   
   input logic [7:0] rsr_data,
-  input logic [7:0] wdata,     // pwdata
+  input logic [31:0] pwdata,     // pwdata
   
   input logic thr_wr_en,      // write enable for tx fifo/thr
   input logic rx_done,        // write enable for rx fifo/rhr
   input logic tsr_load,       // read enable for tx_fifo/thr
   input logic wbr_rd_en,      // read enable for rx_fifo/rhr
+  input logic frame_error,
+  input logic parity_error,
   
   input logic fifoen,
   input logic txclr,
@@ -29,11 +31,11 @@ module buffers(
 );
 
   logic [7:0] fifo_tx_data;
-  logic [7:0] fifo_rbr;
+  logic [9:0] fifo_rbr;
   logic [7:0] tx_fifo_data_in;
   logic [7:0] thr_data_in;
   
-  logic [7:0] rx_fifo_data_in;
+  logic [9:0] rx_fifo_data_in;
   
 
   logic [7:0] thr_data;
@@ -56,7 +58,8 @@ module buffers(
   fifo_sync  #(
   
     .FIFO_DEPTH(16),
-    .DATA_WIDTH(8)
+    .DATA_WIDTH(8),
+    .FIFO_DEPTH_LOG(4)
     
   ) u_tx_fifo (
     
@@ -77,7 +80,8 @@ module buffers(
   fifo_sync  #(
   
     .FIFO_DEPTH(1),
-    .DATA_WIDTH(8)
+    .DATA_WIDTH(8),
+    .FIFO_DEPTH_LOG(1)
     
   ) u_thr (
     
@@ -99,8 +103,8 @@ module buffers(
   
   always@(*) begin
     casez(fifoen) 
-      1'b0 : thr_data_in = wdata;
-      1'b1 : tx_fifo_data_in = wdata;
+      1'b0 : thr_data_in = pwdata;
+      1'b1 : tx_fifo_data_in = pwdata;
     endcase
   end
   
@@ -115,7 +119,9 @@ module buffers(
   
   fifo_sync  #(
     .FIFO_DEPTH(16),
-    .DATA_WIDTH(10)
+    .DATA_WIDTH(10),
+    .FIFO_DEPTH_LOG(4)
+    
   ) u_rx_fifo (
     
     .clk        ( pclk          ),
@@ -140,7 +146,8 @@ module buffers(
   
   fifo_sync  #(
     .FIFO_DEPTH(1),
-    .DATA_WIDTH(8)
+    .DATA_WIDTH(8),
+    .FIFO_DEPTH_LOG(1)
   ) u_rhr (
     
     .clk        ( pclk          ),
@@ -165,7 +172,7 @@ module buffers(
   always@(*) begin
     casez(fifoen) 
       1'b0 : rhr_data_in = rsr_data;
-      1'b1 : rx_fifo_data_in = rsr_data;
+      1'b1 : rx_fifo_data_in = {frame_error,parity_error,rsr_data[7:0]};
     endcase
   end  
   

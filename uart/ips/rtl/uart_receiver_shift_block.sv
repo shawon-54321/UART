@@ -1,8 +1,8 @@
 module uart_receiver_shift_block (
-  input  logic       pckl,             // UART clock
+  input  logic       pclk,             // UART clock
   input  logic       presetn,          // Active-low reset
   input  logic       receive_shift_en, // Enable shift register
-  input  logic       uartn_rxd,        // Serial data input
+  input  logic       uart_rxd,        // Serial data input
   input  logic       error_check,
   input  logic       loop_txd,
   input  logic       loop,
@@ -20,7 +20,7 @@ module uart_receiver_shift_block (
   logic       serial_in;
 
   assign shift_mode = receive_shift_en ? 2'b01 : 2'b00;
-  assign serial_in  = loop ? loop_txd : uartn_rxd; 
+  assign serial_in  = loop ? loop_txd : uart_rxd; 
 
   universal_shift_reg #(
     .DATA_WIDTH(10)
@@ -28,8 +28,8 @@ module uart_receiver_shift_block (
     .clk          ( pckl         ),
     .rst          ( presetn      ),      
     .select       ( shift_mode   ),
-    .p_din        ( '0           ),
-    .s_left_din   ( '0           ),
+    .p_din        ( 10'b0           ),
+    .s_left_din   ( 1'b0           ),
     .s_right_din  ( serial_in    ),
     .p_dout       ( shift_reg_out),
     .s_left_dout  (              ), 

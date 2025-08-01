@@ -2,7 +2,7 @@ module uart_receive_fsm (
   input  logic pclk,
   input  logic presetn,
   input  logic utrrst,       //uart receive enable
-  input  logic uartn_rxd,    //uart serial input line
+  input  logic uart_rxd,    //uart serial input line
   input  logic sample_edge,
   input  logic receive_done,
 
@@ -26,8 +26,8 @@ module uart_receive_fsm (
   //NSL
   always@(*)begin
     casez (pstate)
-      IDLE    : nstate = (utrrst & (~ uartn_rxd)) ? START : IDLE;
-      START   : nstate = utrrst ? (sample_edge ? ((~ uartn_rxd) ? RECEIVE : IDLE) : START) : IDLE;
+      IDLE    : nstate = (utrrst & (~ uart_rxd)) ? START : IDLE;
+      START   : nstate = utrrst ? (sample_edge ? ((~ uart_rxd) ? RECEIVE : IDLE) : START) : IDLE;
       RECEIVE : nstate = (~ receive_done & utrrst) ? IDLE : RECEIVE;
     endcase
   end
@@ -40,7 +40,7 @@ module uart_receive_fsm (
 
   //PSR
   dff #(
-    .DFF_WIDTH(2)
+    .FLOP_WIDTH(2)
   ) u_dff (
     .clk     ( pclk   ),
     .reset_b ( presetn),

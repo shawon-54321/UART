@@ -51,6 +51,10 @@ module uart_transmitter (
  logic [3:0] tx_cnt;
  logic [3:0] data_cnt;
  logic [3:0] shift_cnt;
+ logic [3:0] shift_cnt_i0;
+ logic [3:0] shift_cnt_i1;
+ logic [3:0] shift_cnt_i2;
+ logic [3:0] shift_cnt_i3; 
  
   counter #(.RESET_VALUE(0),
             .COUNTER_WIDTH(4)
@@ -73,14 +77,20 @@ module uart_transmitter (
     .out ( data_cnt)
   );
 
+  assign shift_cnt_i0 = data_cnt + 1;
+  assign shift_cnt_i1 = data_cnt + 2;
+  assign shift_cnt_i2 = data_cnt + 2;
+  assign shift_cnt_i3 = data_cnt + 3;
+
+
   mux4to1 #(.LINE_WIDTH(4)
   
   ) u_shift_cnt_mux (
     .sel ( {pen,stb}    ),
-    .in0 ( data_cnt + 1 ),
-    .in1 ( data_cnt + 2 ),
-    .in2 ( data_cnt + 2 ),
-    .in3 ( data_cnt + 3 ),
+    .in0 ( shift_cnt_i0 ),
+    .in1 ( shift_cnt_i1 ),
+    .in2 ( shift_cnt_i2 ),
+    .in3 ( shift_cnt_i3 ),
     .out ( shift_cnt    )
   );
   
@@ -100,17 +110,17 @@ module uart_transmitter (
   
   ) u_data_len_mux (
     .sel ( wls          ),
-    .in0 ( tx_data[4:0] ),
-    .in1 ( tx_data[5:0] ),
-    .in2 ( tx_data[6:0] ),
-    .in3 ( tx_data[7:0] ),
-    .out ( data         )
+    .in0 ( {3'b0,tx_data[4:0]} ),
+    .in1 ( {2'b0,tx_data[5:0]} ),
+    .in2 ( {1'b0,tx_data[6:0]} ),
+    .in3 ( tx_data[7:0]        ),
+    .out ( data                )
   );
   
   assign odd_parity = ^{data,1'b1};
   assign even_parity= ^{data,1'b0};
 
-  mux4to1 #(.LINE_WIDTH(4)
+  mux4to1 #(.LINE_WIDTH(1)
   
   ) u_par_type_mux (
     .sel ( {sp,eps}    ),
@@ -145,11 +155,11 @@ module uart_transmitter (
   
   ) u_tx_data_mux (
     .sel ( wls                          ),
-    .in0 ( {stb,1'b1,tx_data[4:0],1'b0} ),
-    .in1 ( {stb,1'b1,tx_data[5:0],1'b0} ),
-    .in2 ( {stb,1'b1,tx_data[6:0],1'b0} ),
-    .in3 ( {stb,1'b1,tx_data[7:0],1'b0} ),
-    .out ( shift_data                   )
+    .in0 ( {3'b0,stb,1'b1,tx_data[4:0],1'b0} ),
+    .in1 ( {2'b0,stb,1'b1,tx_data[5:0],1'b0} ),
+    .in2 ( {1'b0,stb,1'b1,tx_data[6:0],1'b0} ),
+    .in3 ( {stb,1'b1,tx_data[7:0],1'b0}      ),
+    .out ( shift_data                        )
   );
 
   assign rsr_data_d = tsr_load? shift_data : shift_en? {1'b0,rsr_data[10:1]} : rsr_data;
