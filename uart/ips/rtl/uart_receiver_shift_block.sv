@@ -15,7 +15,7 @@ module uart_receiver_shift_block (
 );
 
   logic [9:0] shift_reg_out;
-  logic       stop_bit_value;
+  //logic       stop_bit_value;
   logic [1:0] shift_mode;
   logic       serial_in;
 
@@ -25,7 +25,7 @@ module uart_receiver_shift_block (
   universal_shift_reg #(
     .DATA_WIDTH(10)
   ) receiver_shift_inst (
-    .clk          ( pckl         ),
+    .clk          ( pclk         ),
     .rst          ( presetn      ),      
     .select       ( shift_mode   ),
     .p_din        ( 10'b0           ),

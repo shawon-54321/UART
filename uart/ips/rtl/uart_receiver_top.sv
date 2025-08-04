@@ -3,7 +3,6 @@ module uart_receiver_top (
   input  logic       presetn,
   input  logic       utrrst,
   input  logic       sample_edge,
-  input  logic       receive_done,
   input  logic       uart_rxd,
   input  logic       loop_txd,
   input  logic       loop,
@@ -15,7 +14,8 @@ module uart_receiver_top (
   output logic [7:0] rsr_data,
   output logic       frame_error,
   output logic       parity_error,
-  output logic       error_check
+  output logic       error_check,
+  output logic       receive_done
 );
 
   logic received_parity;
@@ -33,6 +33,7 @@ module uart_receiver_top (
   logic receive_shift_en;
   logic receive_frame_counter_en;
   logic receive_frame_counter_clear;
+
 
   uart_receive_fsm u_uart_receive_fsm (
     .pclk                        ( pclk                       ),

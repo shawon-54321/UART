@@ -28,7 +28,7 @@ module uart_receive_fsm (
     casez (pstate)
       IDLE    : nstate = (utrrst & (~ uart_rxd)) ? START : IDLE;
       START   : nstate = utrrst ? (sample_edge ? ((~ uart_rxd) ? RECEIVE : IDLE) : START) : IDLE;
-      RECEIVE : nstate = (~ receive_done & utrrst) ? IDLE : RECEIVE;
+      RECEIVE : nstate = (~ receive_done & utrrst) ? RECEIVE : IDLE;
     endcase
   end
 

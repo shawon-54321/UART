@@ -12,16 +12,15 @@ module uart_top (
   output logic        pready,
   output logic [31:0] prdata,
 
-  output logic        uart_tx,
+  output logic        uart_txd,
   output logic        uart_intpt
 );
 
     logic [7:0]  rsr_data;
                  
     logic        thr_wr_en;      
-    logic        rx_done;        
     logic        tsr_load;      
-    logic        wbr_rd_en;      
+    logic        rbr_rd_en;      
                  
     logic        fifoen;
     logic        txclr;
@@ -30,7 +29,7 @@ module uart_top (
                  
                  
     logic [7:0]  tx_data;
-    logic [7:0]  rbr;
+    logic [9:0]  rbr;
     logic        tx_fifo_full;
     logic        rx_fifo_full;
     logic        tx_fifo_empty;
@@ -39,6 +38,7 @@ module uart_top (
     logic        below_level;
     logic        frame_error;
     logic        parity_error;
+    logic       receive_done;
 
 
   buffers u_buffers (
@@ -49,9 +49,9 @@ module uart_top (
     .pwdata         ( pwdata        ),
     
     .thr_wr_en     ( thr_wr_en    ),
-    .rx_done       ( rx_done      ),
+    .receive_done       ( receive_done ),
     .tsr_load      ( tsr_load     ),
-    .wbr_rd_en     ( wbr_rd_en    ),
+    .rbr_rd_en     ( rbr_rd_en    ),
     .frame_error     ( frame_error    ),
     .parity_error     ( parity_error    ),
     
@@ -74,7 +74,6 @@ module uart_top (
 
     logic       urrst;
     logic       sample_edge;
-    logic       receive_done;
     logic       loop_txd;
     logic       loop;
     logic [1:0] wls;
@@ -91,7 +90,6 @@ module uart_top (
     .presetn      ( presetn     ),
     .utrrst       ( urrst       ),
     .sample_edge  ( sample_edge ),
-    .receive_done ( receive_done),
     .uart_rxd     ( uart_rxd    ),
     .loop_txd     ( loop_txd    ),
     .loop         ( loop        ),
@@ -103,7 +101,8 @@ module uart_top (
     .rsr_data     ( rsr_data    ),
     .frame_error  ( frame_error ),
     .parity_error ( parity_error),
-    .error_check  ( error_check )
+    .error_check  ( error_check ),
+    .receive_done ( receive_done)
   );
 
 
@@ -136,14 +135,13 @@ module uart_top (
   );
 
 
-    logic       sample_clk_clr;
     logic [7:0] dlh;
     logic [7:0] dll;
 
   clock_gen u_clock_gen(
     .pclk             ( pclk            ),
     .presetn          ( presetn         ),
-    .sample_clk_clr   ( sample_clk_clr  ),
+    .sample_clk_clr   ( ~urrst  ),
     .transmit_clk_clr ( transmit_clk_clr),
     .dlh              ( dlh             ),
     .dll              ( dll             ),
@@ -175,13 +173,14 @@ module uart_top (
     
     .loop          ( loop         ),
     .thr_wr_en     ( thr_wr_en    ),
-    .wbr_rd_en     ( wbr_rd_en    ),
+    .rbr_rd_en     ( rbr_rd_en    ),
     .rxfiftl       ( rxfiftl      ),
     .txclr         ( txclr        ),
     .rxclr         ( rxclr        ),
     .fifoen        ( fifoen       ),
     .sp            ( sp           ),
     .eps           ( eps          ),
+    .thre             ( thre            ),
     .pen           ( pen          ),
     .stb           ( stb          ),
     .wls           ( wls          ),

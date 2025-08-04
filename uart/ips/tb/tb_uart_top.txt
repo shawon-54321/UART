@@ -13,7 +13,7 @@ module tb_uart_top;
   logic pready;
   logic [31:0] prdata;
   
-  logic uart_tx;
+  logic uart_txd;
 
   always #5 pclk = ~ pclk;
 
@@ -31,7 +31,7 @@ module tb_uart_top;
    .pready     ( pready     ),
    .prdata     ( prdata     ),
    
-   .uart_tx    ( uart_tx    ),
+   .uart_txd    ( uart_txd    ),
    .uart_intpt ( uart_intpt )
   );
 
@@ -53,18 +53,87 @@ module tb_uart_top;
     pwrite   = 0;
     paddr    = 32'h0;
     pwdata   = 32'h0;
-    uart_rxd = 1;
+    uart_rxd = 0;
     repeat(4) @(posedge pclk);
     reset;
 
     repeat(40) @(posedge pclk);
+    dll_wr(8'b011);
+    lcr_wr(8'b00111111);
+    thr_wr(8'b11110011);
+    pwm (1,0);
+          
+    
+    
 
-
-
-    #100;
+    #20000;
 
 
     $finish;
   end
+  
+  task thr_wr (input [7:0] transmit_data);
+    begin 
+      @(posedge pclk);
+      psel = 1;
+      pwrite = 1;
+      paddr = 32'h0;
+      pwdata = {24'b0,transmit_data};
+      @(posedge pclk);  
+      penable = 1;   
+      @(posedge pclk);
+      psel = 0;
+      pwrite = 0;
+      penable = 0; 
+    end
+  endtask  
+
+  task dll_wr (input [7:0] divisor_l);
+    begin 
+      @(posedge pclk);
+      psel = 1;
+      pwrite = 1;
+      paddr = 32'h0020;
+      pwdata = {24'b0,divisor_l};
+      @(posedge pclk);  
+      penable = 1;   
+      @(posedge pclk);
+      psel = 0;
+      pwrite = 0;
+      penable = 0; 
+    end
+  endtask
+
+  task lcr_wr (input [7:0] line_control);
+    begin 
+      @(posedge pclk);
+      psel = 1;
+      pwrite = 1;
+      paddr = 32'h000C;
+      pwdata = {24'b0,line_control};
+      @(posedge pclk);  
+      penable = 1;   
+      @(posedge pclk);
+      psel = 0;
+      pwrite = 0;
+      penable = 0; 
+    end
+  endtask
+
+  task pwm (input tx_en, input rx_en);
+    begin 
+      @(posedge pclk);
+      psel = 1;
+      pwrite = 1;
+      paddr = 32'h0030;
+      pwdata = {32'hFFFFFFFF};
+      @(posedge pclk);  
+      penable = 1;   
+      @(posedge pclk);
+      psel = 0;
+      pwrite = 0;
+      penable = 0; 
+    end
+  endtask
 
 endmodule

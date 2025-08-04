@@ -7,7 +7,7 @@ module apb_intfc(
     input  logic[31:0] paddr,
     input  logic[31:0] pwdata,
     
-    input logic[7:0] rbr,
+    input logic[9:0] rbr,
     input logic parity_error,
     input logic frame_error,
     input logic error_check,
@@ -20,7 +20,7 @@ module apb_intfc(
                            
     output logic       loop,
     output logic       thr_wr_en,
-    output logic       wbr_rd_en,
+    output logic       rbr_rd_en,
     output logic[1:0]  rxfiftl,
     output logic       txclr,
     output logic       rxclr,
@@ -28,6 +28,7 @@ module apb_intfc(
     output logic       sp,
     output logic       eps,
     output logic       pen,
+    output logic       thre,
     output logic       stb,
     output logic[1:0]  wls,
     output logic[7:0]  dll,
@@ -153,12 +154,12 @@ module apb_intfc(
   logic temt_st_d;
   logic pe;
   logic fe;
-  logic thre;
   logic temt;
   logic dr;
 
   logic paddr_eq_rbr_thr;
-  
+
+  assign rbr_rd_en = (paddr_eq_rbr_thr & rd_en);  
   assign paddr_eq_rbr_thr = (paddr[7:0] == 8'b0);
 
   assign parity_st_d = fifoen ? (((rbr[8]) | pe)  & ( ~ (rd_en & paddr_eq_rbr_thr))) : ((parity_error & error_check) | pe) & ( ~ (rd_en & paddr_eq_rbr_thr));
@@ -173,13 +174,13 @@ module apb_intfc(
   assign lsr_d = {thre_st_d, temt_st_d, parity_st_d, frame_st_d,  de_st_d};
   assign pe = lsr_q[1];
   assign fe = lsr_q[2];
-  assign temt = lsr_q[4];
-  assign thre = lsr_q[3];
+  assign temt = lsr_q[3];
+  assign thre = lsr_q[4];
   assign dr = lsr_q[0];
   
   
   dff #(
-   .RESET_VALUE ( 1'b0    ),
+   .RESET_VALUE ( 5'b10000),
    .FLOP_WIDTH  ( 5       )
   )u_lsr(
    .clk         ( pclk    ),
@@ -239,7 +240,7 @@ module apb_intfc(
   //Read logic
   always@(*)begin
     case(paddr[5:0])
-      32'h0   : rd_data = {24'b0, rbr};
+      32'h0   : rd_data = {24'b0, rbr[7:0]};
       32'h4   : rd_data = {29'b0, ier_q[2:0]};
       32'h8   : rd_data = {24'b0, fifoen, fifoen, 5'b0, ~ uart_intpt};
       32'h8   : rd_data = {26'b0, lcr_q [5:0]};
