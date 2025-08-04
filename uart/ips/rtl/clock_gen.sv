@@ -1,4 +1,4 @@
-module clock_gen(
+module transfer_clock_gen(
 		input logic pclk,
 		input logic presetn,
     input logic sample_clk_clr,
@@ -6,6 +6,7 @@ module clock_gen(
     input logic[7:0] dlh,
     input logic[7:0] dll,
 
+    output logic voting_edge,
     output logic sample_edge,
     output logic transmit_edge
 
@@ -32,7 +33,7 @@ module clock_gen(
   //Final edge detection flops
   dff #(
   	.RESET_VALUE(1'b0),
-  	.FLOP_WIDTH(2)
+  	.FLOP_WIDTH(3)
   )u_flops(
    .clk     ( pclk             ),
    .reset_b ( presetn          ),
@@ -71,12 +72,13 @@ module clock_gen(
   assign comp_out_rx = counter_rx == comp_value;
   assign comp_out_tx = counter_tx == comp_value;
   assign comp_value  = {dlh[7:0], dll[7:1]};
-  assign d_edge_detection[0] = sample_edge_cnt == 4'b0111;
+  assign d_edge_detection[0] = (sample_edge_cnt == 4'b0110) | (sample_edge_cnt == 4'b0111) | (sample_edge_cnt == 4'b1000);
   assign d_edge_detection[1] = transmit_edge_cnt == 4'b1111;
+  assign d_edge_detection[2] = sample_edge_cnt == 4'b1001;
 
   //output
-  assign sample_edge    = ~q_edge_detection[0] & d_edge_detection[0];
+  assign voting_edge    = ~q_edge_detection[0] & d_edge_detection[0];
   assign transmit_edge  = ~q_edge_detection[1] & d_edge_detection[1];
-
+  assign sample_edge    = ~q_edge_detection[2] & d_edge_detection[2];
 
 endmodule
