@@ -7,35 +7,39 @@ module apb_intfc(
     input  logic[31:0] paddr,
     input  logic[31:0] pwdata,
     
-    input logic[9:0] rbr,
+    input logic[7:0] rbr,
     input logic parity_error,
     input logic frame_error,
     input logic error_check,
     input logic shift_cnt_eq,
     input logic rx_fifo_empty,
-    input logic tx_fifo_empty,
     input logic tsr_load,
-    input logic receive_done,
-    
                            
     output logic       loop,
     output logic       thr_wr_en,
-    output logic       rbr_rd_en,
+    output logic       wbr_rd_en,
     output logic[1:0]  rxfiftl,
     output logic       txclr,
     output logic       rxclr,
     output logic       fifoen,
     output logic       sp,
-    output logic       eps,
+    output logic       esp,
     output logic       pen,
-    output logic       thre,
     output logic       stb,
-    output logic[1:0]  wls,
+    output logic       wls,
     output logic[7:0]  dll,
     output logic[7:0]  dlh,
     output logic       urrst,
     output logic       utrst,
-    output logic       uart_intpt,
+
+    //intpt signals 
+    output logic       thre,
+    output logic       etbei,
+    output logic       pe,
+    output logic       elsi,
+    output logic       fe,
+    output logic       dr,
+    output logic       erbi,
                        
     output logic       pready,
     output logic[31:0] prdata
@@ -52,20 +56,9 @@ module apb_intfc(
 
 
   //APB FSM
-  logic wr_en;
-  logic rd_en;
+  apb_fsm u_apb_fsm(
 
-  fsm_apb_protocol i_fsm_apb_protocol (
-    .pclk    (pclk    ),
-    .preset_n(presetn),
-    .psel    (psel    ),
-    .pwrite  (pwrite  ),
-    .penable (penable ),
-    .pready  (pready  ),
-    .rd_en   (rd_en   ),
-    .wr_en   (wr_en   )
   );
-
 
   //comparator
   assign thr_wr_en = (paddr[7:0] == 8'b0) & wr_en;
@@ -79,9 +72,6 @@ module apb_intfc(
   
 
   //Interrupt enable register
-  logic elsi;
-  logic etbei;
-  logic erbi;
   logic[2:0] ier_d;
   logic[2:0] ier_q;
 
@@ -109,7 +99,7 @@ module apb_intfc(
   assign fifoen = fcr_q[0];
   assign rxclr = fcr_q[1];
   assign txclr = fcr_q[2];
-  assign rxfiftl = fcr_q[3];
+  assign rxfiftl = fcr_q[3:4];
   
   dff #(
    .RESET_VALUE ( 1'b0    ),
@@ -152,20 +142,13 @@ module apb_intfc(
   logic de_st_d;
   logic thre_st_d;
   logic temt_st_d;
-  logic pe;
-  logic fe;
   logic temt;
-  logic dr;
+  
 
-  logic paddr_eq_rbr_thr;
-
-  assign rbr_rd_en = (paddr_eq_rbr_thr & rd_en);  
-  assign paddr_eq_rbr_thr = (paddr[7:0] == 8'b0);
-
-  assign parity_st_d = fifoen ? (((rbr[8]) | pe)  & ( ~ (rd_en & paddr_eq_rbr_thr))) : ((parity_error & error_check) | pe) & ( ~ (rd_en & paddr_eq_rbr_thr));
-  assign frame_st_d = fifoen ? ((rbr[9] | fe) & ( ~ (rd_en & paddr_eq_rbr_thr))) : ((frame_error & error_check) | fe) & ( ~ (rd_en & paddr_eq_rbr_thr));
-  assign de_st_d = fifoen ? ~rx_fifo_empty : ((receive_done | dr) & ( ~ (rd_en & paddr_eq_rbr_thr)));
-  assign thre_st_d = ~thr_wr_en & ((~fifoen & tsr_load) | ((fifoen & tx_fifo_empty) | thre));
+  assign parity_st_d = fifoen ? (((rbr[8]) | pe)  & ( ~ (rd_en & paddr_eq_rbr_thr)) : ((parity_error & error_check) | pe) & ( ~ (rd_en & paddr_eq_rbr_thr));
+  assign frame_st_d = fifoen ? ((rbr[9] | fe) & ( ~ (rd_en & paddr_eq_rbr_thr)) : ((frame_error & error_check) | fe) & ( ~ (rd_en & paddr_eq_rbr_thr));
+  assign de_st_d = fifoen ? ~rx_fifo_empty : ((receive_done | dr) & ( ~ (rd_en & paddr_eq_rbr_thr));
+  assign thre_st_d = ~thr_wr_en & ((~fifoen & tsr_load) | ((fifoen & fifo_empty) | thre));
   assign temt_st_d = shift_cnt_eq ? thre : temt;
   
 
@@ -174,13 +157,13 @@ module apb_intfc(
   assign lsr_d = {thre_st_d, temt_st_d, parity_st_d, frame_st_d,  de_st_d};
   assign pe = lsr_q[1];
   assign fe = lsr_q[2];
-  assign temt = lsr_q[3];
-  assign thre = lsr_q[4];
+  assign temt = lsr_q[4];
+  assign thre = lsr_q[3];
   assign dr = lsr_q[0];
   
   
   dff #(
-   .RESET_VALUE ( 5'b10000),
+   .RESET_VALUE ( 1'b0    ),
    .FLOP_WIDTH  ( 5       )
   )u_lsr(
    .clk         ( pclk    ),
@@ -240,23 +223,19 @@ module apb_intfc(
   //Read logic
   always@(*)begin
     case(paddr[5:0])
-      32'h0   : rd_data = {24'b0, rbr[7:0]};
-      32'h4   : rd_data = {29'b0, ier_q[2:0]};
-      32'h8   : rd_data = {24'b0, fifoen, fifoen, 5'b0, ~ uart_intpt};
-      32'h8   : rd_data = {26'b0, lcr_q [5:0]};
-      32'h8   : rd_data = {17'b0, temt, thre, 1'b0, fe, pe, 1'b0, dr};
-      32'h8   : rd_data = {24'b0, dll};
-      32'h8   : rd_data = {24'b0, dlh};
+      32'h0   : rd_data = {24'b0, rbr};
+      32'h4   : rd_data = [29'b0, ier_q[2:0]};
+      32'h8   : rd_data = {24'b0, fifoen, fifoen, 5'b0, ~ intpt}
+      32'h8   : rd_data = {26'b0, lcr_q [5:0]}
+      32'h8   : rd_data = {17'b0, tmt, thre, 1'b0, fe, pe, 1'b0, dr}
+      32'h8   : rd_data = {24'b0, dll_q};
+      32'h8   : rd_data = {24'b0, dlh_q}
       32'h8   : rd_data = {17'b0, pwr_q[1:0], 13'b0};
       default : rd_data = 32'bx;
     endcase
   end
 
   assign prdata = rd_en ? rd_data : 32'b0;
-
-
-  //Interrupt output
-  assign uart_intpt = (thre & etbei) | (pe & elsi) | (fe & elsi) | (dr & erbi);
 
 
 endmodule

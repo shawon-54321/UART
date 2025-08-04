@@ -150,48 +150,73 @@ module uart_top (
     .transmit_edge    ( transmit_edge   )
   );
 
+  uart_intpt_gen u_uart_intpt_gen
+  (
+    .thre       ( thre       ),
+    .etbei      ( etbei      ),
+    .pe         ( pe         ),
+    .elsi       ( elsi       ),
+    .fe         ( fe         ),
+    .dr         ( dr         ),
+    .erbi       ( erbi       ),
+    
+    .uart_intpt ( uart_intpt ),
+  );
 
+   
+   logic thre;
+   logic etbei;
+   logic pe;
+   logic elsi;
+   logic fe;
+   logic dr;
+   logic erbi;
 
   apb_intfc u_apb_intfc (
-    .pclk          ( pclk         ),
-    .presetn       ( presetn      ),
-    .psel          ( psel         ),
-    .pwrite        ( pwrite       ),
-    .penable       ( penable      ),
-    .paddr         ( paddr        ),
-    .pwdata        ( pwdata       ),
-    
-    .rbr           ( rbr          ),
-    .parity_error  ( parity_error ),
-    .frame_error   ( frame_error  ),
-    .error_check   ( error_check  ),
-    .shift_cnt_eq  ( shift_cnt_eq ),
-    .rx_fifo_empty ( rx_fifo_empty),
-    .tx_fifo_empty ( tx_fifo_empty),
-    .tsr_load      ( tsr_load     ),
-    .receive_done (receive_done),
-    
-    .loop          ( loop         ),
-    .thr_wr_en     ( thr_wr_en    ),
-    .rbr_rd_en     ( rbr_rd_en    ),
-    .rxfiftl       ( rxfiftl      ),
-    .txclr         ( txclr        ),
-    .rxclr         ( rxclr        ),
-    .fifoen        ( fifoen       ),
-    .sp            ( sp           ),
-    .eps           ( eps          ),
-    .thre             ( thre            ),
-    .pen           ( pen          ),
-    .stb           ( stb          ),
-    .wls           ( wls          ),
-    .dll           ( dll          ),
-    .dlh           ( dlh          ),
-    .urrst         ( urrst        ),
-    .utrst         ( utrst        ),
-    .uart_intpt    ( uart_intpt   ),
-    
-    .pready        ( pready       ),
-    .prdata        ( prdata       )
+   .pclk          ( pclk          ),
+   .presetn       ( presetn       ),
+   .psel          ( psel          ),
+   .pwrite        ( pwrite        ),
+   .penable       ( penable       ),
+   .paddr         ( paddr         ),
+   .pwdata        ( pwdata        ),
+   
+   .rbr           ( rbr           ),
+   .parity_error  ( parity_error  ),
+   .frame_error   ( frame_error   ),
+   .error_check   ( error_check   ),
+   .shift_cnt_eq  ( shift_cnt_eq  ),
+   .rx_fifo_empty ( rx_fifo_empty ),
+   .tsr_load      ( tsr_load      ),
+   
+   .loop          ( loop          ),
+   .thr_wr_en     ( thr_wr_en     ),
+   .wbr_rd_en     ( wbr_rd_en     ),
+   .rxfiftl       ( rxfiftl       ),
+   .txclr         ( txclr         ),
+   .rxclr         ( rxclr         ),
+   .fifoen        ( fifoen        ),
+   .sp            ( sp            ),
+   .esp           ( esp           ),
+   .pen           ( pen           ),
+   .stb           ( stb           ),
+   .wls           ( wls           ),
+   .dll           ( dll           ),
+   .dlh           ( dlh           ),
+   .urrst         ( urrst         ),
+   .utrst         ( utrst         ),
+   
+   
+   .thre          ( thre          ),
+   .etbei         ( etbei         ),
+   .pe            ( pe            ),
+   .elsi          ( elsi          ),
+   .fe            ( fe            ),
+   .dr            ( dr            ),
+   .erbi          ( erbi          ),
+   
+   .pready        ( pready        ),
+   .prdata        ( prdata        ),
   ); 
 
 endmodule
