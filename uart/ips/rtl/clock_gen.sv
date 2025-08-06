@@ -63,8 +63,8 @@ module clock_gen(
       sample_edge_cnt   <=  (bclk_rx & comp_out_rx) + sample_edge_cnt;
       transmit_edge_cnt <= (bclk_tx & comp_out_tx) + transmit_edge_cnt;
 
-      counter_rx        <= sample_clk_clr | comp_out_rx ? 16'b1 : counter_rx + 1'b1;
-      counter_tx        <= transmit_clk_clr | comp_out_tx ? 16'b1 : counter_tx + 1'b1;
+      counter_rx        <= (sample_clk_clr | comp_out_rx) ? 16'b1 : counter_rx + 1'b1;
+      counter_tx        <= (transmit_clk_clr | comp_out_tx) ? 16'b1 : counter_tx + 1'b1;
     end
   end
 
@@ -79,7 +79,7 @@ module clock_gen(
 
   //output
   assign voting_edge    = (~q_edge_detection[0] & d_edge_detection[0]) | (~q_edge_detection[1] & d_edge_detection[1]) | (~q_edge_detection[2] & d_edge_detection[2]);
-  assign transmit_edge  = ~q_edge_detection[3] & d_edge_detection[3];
-  assign sample_edge    = ~q_edge_detection[4] & d_edge_detection[4];
+  assign transmit_edge  = ~q_edge_detection[3] & d_edge_detection[3] & ~transmit_clk_clr;
+  assign sample_edge    = ~q_edge_detection[4] & d_edge_detection[4] & ~sample_clk_clr;
 
 endmodule

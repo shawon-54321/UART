@@ -32,9 +32,9 @@ module apb_intfc(
   output logic        eps,
   output logic        pen,
   output logic        stb,
-  output logic        wls,
-  output logic[7:0]   dll,
-  output logic[7:0]   dlh,
+  output logic [1:0]  wls,
+  output logic [7:0]  dll,
+  output logic [7:0]  dlh,
   output logic        urrst,
   output logic        utrst,
                       
@@ -190,10 +190,10 @@ module apb_intfc(
 
 
   assign lsr_d = {temt_st_d, thre_st_d, bi_st_d, frame_st_d, parity_st_d, oe_st_d ,de_st_d};
-  assign pe    = lsr_q[1];
-  assign fe    = lsr_q[2];
-  assign temt  = lsr_q[3];
-  assign thre  = lsr_q[4];
+  assign pe    = lsr_q[2];
+  assign fe    = lsr_q[3];
+  assign temt  = lsr_q[6];
+  assign thre  = lsr_q[5];
   assign dr    = lsr_q[0];
   
   

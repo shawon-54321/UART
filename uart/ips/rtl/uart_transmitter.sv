@@ -175,7 +175,7 @@ module uart_transmitter (
   );
 
   assign uart_txd = (loop | not_op)? 1'b1 : par? parity : rsr_data[0];
-  assign loop_txd = par? parity : rsr_data[0];
+  assign loop_txd = not_op? 1'b1 : par? parity : rsr_data[0];
 
 //.........................................................................................//
 

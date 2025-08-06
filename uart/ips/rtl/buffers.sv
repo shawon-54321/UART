@@ -51,7 +51,7 @@ module buffers(
     assign wr_en_rx_fifo = receive_done & fifoen;
     assign rd_en_rx_fifo = rbr_rd_en & fifoen;
 
-	
+    
 
   
   

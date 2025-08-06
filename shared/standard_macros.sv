@@ -123,34 +123,7 @@ module mod_n_counter #(
 endmodule
 //---------------------------------------------------------------------------------------------------------------
 
-//4 to 1 \
 
-module mux4to1#(
-  parameter LINE_WIDTH = 1
-	
-)(
-  input  logic [1:0]sel,
-  input  logic [LINE_WIDTH-1:0] in0,
-  input  logic [LINE_WIDTH-1:0] in1,
-  input  logic [LINE_WIDTH-1:0] in2,
-  input  logic [LINE_WIDTH-1:0] in3,
-  
-  output logic [LINE_WIDTH-1:0] out
-);
-
-  always @(*) begin
-    casez(sel)
-      2'b00   : out = in0;
-      2'b01   : out = in1;
-      2'b10   : out = in2;
-      2'b11   : out = in3;
-      default : out = 'bx; 
-    endcase
-  end
- 
-endmodule
-
-//---------------------------------------------------------------------------------------------------------------
 
 //8 to 1 MUX
 module mux8to1 (
@@ -518,7 +491,7 @@ endmodule
 module fifo_sync #( 
      parameter FIFO_DEPTH = 8,
 	   parameter DATA_WIDTH = 32,
-	   parameter FIFO_DEPTH_LOG = 3
+     parameter FIFO_DEPTH_LOG = 3
 	   )(
 	     input logic clk, 
        input logic rst_n,
@@ -527,20 +500,19 @@ module fifo_sync #(
        input logic clear,
        input logic [DATA_WIDTH-1:0] data_in, 
        output logic [DATA_WIDTH-1:0] data_out, 
-       output logic [DATA_WIDTH-1:0] data_count, 
+       output logic [FIFO_DEPTH_LOG:0] data_count, 
 	     output logic empty,
 	     output logic full
 	    
 	   ); 
 
-  ///localparam FIFO_DEPTH_LOG = $clog2(FIFO_DEPTH);// 
-	
+  
     // Declare a by-dimensional array to store the data
   logic [DATA_WIDTH-1:0] fifo [0:FIFO_DEPTH-1];// depth 8 => [0:7] 32 bit elements
 	
 	// Wr/Rd pointer have 1 extra bits at MSB
-  logic [FIFO_DEPTH_LOG:0] write_pointer;//3:0
-  logic [FIFO_DEPTH_LOG:0] read_pointer;//3:0
+  logic [FIFO_DEPTH_LOG-1:0] write_pointer;//3:0
+  logic [FIFO_DEPTH_LOG-1:0] read_pointer;//3:0
   logic fifo_wr_en;
   logic fifo_rd_en;
   
@@ -569,11 +541,13 @@ module fifo_sync #(
 		  end
 		  
       else begin
-        data_out <= (fifo_rd_en && ~empty) ? fifo[read_pointer[FIFO_DEPTH_LOG-1:0]] : 'b0;
+        
 	      read_pointer <= clear ? ( write_pointer <= 'b0 ) : ((fifo_rd_en && ~empty) ?  (read_pointer + 1'b1) : read_pointer) ;
       end
       
 	end
+  
+  assign data_out[DATA_WIDTH-1:0] =  fifo[read_pointer[FIFO_DEPTH_LOG-1:0]] ;
 	
 	
  // Counter to count the number of data is written to the FIFO 
@@ -678,3 +652,126 @@ endmodule
 
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+//.......................mux4to1.............
+module mux4to1#(
+  parameter LINE_WIDTH = 1
+    
+)(
+  input  logic [1:0]sel,
+  input  logic [LINE_WIDTH-1:0] in0,
+  input  logic [LINE_WIDTH-1:0] in1,
+  input  logic [LINE_WIDTH-1:0] in2,
+  input  logic [LINE_WIDTH-1:0] in3,
+  
+  output logic [LINE_WIDTH-1:0] out
+);
+
+  always @(*) begin
+    casez(sel)
+      2'b00   : out = in0;
+      2'b01   : out = in1;
+      2'b10   : out = in2;
+      2'b11   : out = in3;
+      default : out = 'bx; 
+    endcase
+  end
+ 
+endmodule
+
+  //..>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> fifo without read delay >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+module fifo_syncs #( 
+  parameter FIFO_DEPTH = 8,
+  parameter DATA_WIDTH = 32,
+  parameter FIFO_DEPTH_LOG = 3
+  )(
+  input logic clk, 
+  input logic rst_n,
+  input logic wr_en, 
+  input logic rd_en, 
+  input logic clear,
+  input logic [DATA_WIDTH-1:0] data_in, 
+  output logic [DATA_WIDTH-1:0] data_out, 
+  output logic [FIFO_DEPTH_LOG:0] data_count, 
+  output logic empty,
+  output logic full
+        
+       ); 
+
+    
+    // Declare a by-dimensional array to store the data
+  logic [DATA_WIDTH-1:0] fifo [0:FIFO_DEPTH-1];// depth 8 => [0:7] 32 bit elements
+    
+    // Wr/Rd pointer have 1 extra bits at MSB
+  logic [FIFO_DEPTH_LOG-1:0] write_pointer;//3:0
+  logic [FIFO_DEPTH_LOG-1:0] read_pointer;//3:0
+  logic fifo_wr_en;
+  logic fifo_rd_en;
+  
+  //write enbale and read enable logic with full and empty 
+  assign fifo_wr_en = ~full & wr_en;
+  assign fifo_rd_en = ~empty & rd_en;
+
+  //write
+    always @(posedge clk or negedge rst_n) begin
+      
+      if(~rst_n)
+            write_pointer <= 0;
+            
+      else  begin
+         fifo[write_pointer[FIFO_DEPTH_LOG-1:0]] <= (fifo_wr_en && ~full) ?  data_in : fifo[write_pointer[FIFO_DEPTH_LOG-1:0]];
+           write_pointer <= clear ? ( write_pointer <= 'b0 ) : ( (fifo_wr_en && ~full) ? ( write_pointer + 1'b1 ) :  write_pointer ) ;
+      end
+      
+    end
+  
+    //read
+    always @(posedge clk or negedge rst_n) begin
+      
+        if(~rst_n) begin
+            read_pointer <= 0;
+          end
+          
+      else begin        
+          read_pointer <= clear ? ( write_pointer <= 'b0 ) : ((fifo_rd_en && ~empty) ?  (read_pointer + 1'b1) : read_pointer) ;
+      end
+      
+    end
+    
+    assign data_out =  fifo[read_pointer[FIFO_DEPTH_LOG-1:0]] ;
+    
+    
+ // Counter to count the number of data is written to the FIFO 
+  always @(posedge clk or negedge rst_n) begin
+  
+        if(~rst_n) begin
+              data_count[FIFO_DEPTH_LOG:0] <= 'b0;
+            end 
+            
+        else  begin
+        
+          if(clear) begin
+            data_count[FIFO_DEPTH_LOG:0] <= 'b0;
+          end
+          
+          else begin
+            casez({fifo_wr_en,fifo_rd_en})
+              2'b00   : data_count[FIFO_DEPTH_LOG:0] <= data_count[FIFO_DEPTH_LOG:0];
+              2'b01   : data_count[FIFO_DEPTH_LOG:0] <= empty ? data_count[FIFO_DEPTH_LOG:0] : data_count[FIFO_DEPTH_LOG:0] - 1;
+              2'b10   : data_count[FIFO_DEPTH_LOG:0] <= full ? data_count[FIFO_DEPTH_LOG:0] : data_count[FIFO_DEPTH_LOG:0] + 1;
+              2'b11   : data_count[FIFO_DEPTH_LOG:0] <= data_count[FIFO_DEPTH_LOG:0]; 
+              default : data_count[FIFO_DEPTH_LOG:0] <= 'bx;            
+            endcase
+          end
+        end
+  end
+   
+  assign empty             = data_count == 0;
+  assign full              = data_count == FIFO_DEPTH;
+  
+  
+endmodule

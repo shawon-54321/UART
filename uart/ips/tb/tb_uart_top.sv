@@ -58,15 +58,24 @@ module tb_uart_top;
     reset;
 
     repeat(40) @(posedge pclk);
+
     dll_wr(8'b011);
-    lcr_wr(8'b00111111);
+    write(32'h8,{24'b0,8'b00000001}); // FCR -> fifen = 1
+    
+    lcr_wr(8'b10111111);
+    //write(32'h8,{24'b0,8'b00000001}); // FCR -> fifen = 1
     thr_wr(8'b11110011);
-    pwm (1,0);
-          
+    thr_wr(8'b11111111);
+    thr_wr(8'b00001000);
+    thr_wr(8'b10000001);
+    thr_wr(8'b00000000);
+    
+    
+    pwm (1,1);     
     
     
 
-    #20000;
+    #200000;
 
 
     $finish;
@@ -111,6 +120,22 @@ module tb_uart_top;
       pwrite = 1;
       paddr = 32'h000C;
       pwdata = {24'b0,line_control};
+      @(posedge pclk);  
+      penable = 1;   
+      @(posedge pclk);
+      psel = 0;
+      pwrite = 0;
+      penable = 0; 
+    end
+  endtask
+  
+  task write (input [31:0] adr, input [31:0] data );
+    begin 
+      @(posedge pclk);
+      psel = 1;
+      pwrite = 1;
+      paddr = adr;
+      pwdata = data;
       @(posedge pclk);  
       penable = 1;   
       @(posedge pclk);

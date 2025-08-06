@@ -55,7 +55,7 @@ module uart_receive_fsm (
   assign receive_frame_counter_clear = ~ receive_st;
   assign voting_shift_en             = (receive_st | start_st | wait_st | break_st) & voting_edge;
   assign uart_break                  = break_st & (~ rx_data);
-  assign receive_load_en             = (wait_st & ((~ all_zero) & rx_data)) | (break_st & rx_data); 
+  assign receive_load_en             = (receive_st & (utrrst & receive_done)) | (break_st & rx_data); 
 
   //PSR
   dff #(
