@@ -1,0 +1,15 @@
+../rtl/standard_macros.sv
+../rtl/apb_intfc.sv
+../rtl/buffers.sv
+../rtl/clock_gen.sv
+../rtl/parity_checker.sv
+../rtl/receive_frame_detector.sv
+../rtl/transmit_fsm.sv
+../rtl/uart_receive_fsm.sv
+../rtl/uart_receiver_shift_block.sv
+../rtl/uart_receiver_top.sv
+../rtl/uart_top.sv
+../rtl/fsm_apb_protocol.sv
+../rtl/uart_transmitter.sv
+../rtl/uart_intpt_gen.sv
+../tb/tb_uart_top.sv

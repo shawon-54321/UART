@@ -42,7 +42,7 @@ module transmit_fsm (
   assign par              = (pstate == PARITY);
   assign not_op           = (pstate == IDLE) | (pstate == START);
   assign shift_count_clr  = (pstate == TRANSMIT) & (thre? shift_cnt_eq & transmit_edge : shift_cnt_eq) ;
-  assign tsr_load         = (pstate == START) & transmit_edge  ;
+  assign tsr_load         = (pstate == START) & transmit_edge ;
 
   
   dff #(.RESET_VALUE(IDLE),

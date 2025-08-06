@@ -29,7 +29,7 @@ module uart_top (
                  
                  
     logic [7:0]  tx_data;
-    logic [9:0]  rbr;
+    logic [10:0] rbr;
     logic        tx_fifo_full;
     logic        rx_fifo_full;
     logic        tx_fifo_empty;
@@ -38,37 +38,40 @@ module uart_top (
     logic        below_level;
     logic        frame_error;
     logic        parity_error;
-    logic       receive_done;
+    logic        receive_done;
+    logic        rbrf;
+    logic       uart_break;
 
 
   buffers u_buffers (
-    .pclk          ( pclk         ),
-    .presetn       ( presetn      ),
+    .pclk          ( pclk          ),
+    .presetn       ( presetn       ),
     
-    .rsr_data      ( rsr_data     ),
-    .pwdata         ( pwdata        ),
+    .rsr_data      ( rsr_data      ),
+    .pwdata        ( pwdata        ),
     
-    .thr_wr_en     ( thr_wr_en    ),
-    .receive_done       ( receive_done ),
-    .tsr_load      ( tsr_load     ),
-    .rbr_rd_en     ( rbr_rd_en    ),
-    .frame_error     ( frame_error    ),
-    .parity_error     ( parity_error    ),
+    .thr_wr_en     ( thr_wr_en     ),
+    .receive_done  ( receive_done  ),
+    .tsr_load      ( tsr_load      ),
+    .rbr_rd_en     ( rbr_rd_en     ),
+    .frame_error   ( frame_error   ),
+    .parity_error  ( parity_error  ),
+    .uart_break    ( uart_break    ),
+    .fifoen        ( fifoen        ),
+    .txclr         ( txclr         ),
+    .rxclr         ( rxclr         ),
+    .rxfiftl       ( rxfiftl       ),
     
-    .fifoen        ( fifoen       ),
-    .txclr         ( txclr        ),
-    .rxclr         ( rxclr        ),
-    .rxfiftl       ( rxfiftl      ),
     
+    .tx_data       ( tx_data       ),
+    .rbr           ( rbr           ),
+    .tx_fifo_full  ( tx_fifo_full  ),
+    .rx_fifo_full  ( rx_fifo_full  ),
+    .tx_fifo_empty ( tx_fifo_empty ),
+    .rx_fifo_empty ( rx_fifo_empty ),
     
-    .tx_data       ( tx_data      ),
-    .rbr           ( rbr          ),
-    .tx_fifo_full  ( tx_fifo_full ),
-    .rx_fifo_full  ( rx_fifo_full ),
-    .tx_fifo_empty ( tx_fifo_empty),
-    .rx_fifo_empty ( rx_fifo_empty),
-    
-    .below_level   ( below_level  )
+    .below_level   ( below_level   ),
+    .rbrf          ( rbrf          )
   );
 
 
@@ -84,25 +87,28 @@ module uart_top (
 
     logic       error_check;
 
+    logic       voting_edge;
 
   uart_receiver_top u_uart_receive_top (
-    .pclk         ( pclk        ),
-    .presetn      ( presetn     ),
-    .utrrst       ( urrst       ),
-    .sample_edge  ( sample_edge ),
-    .uart_rxd     ( uart_rxd    ),
-    .loop_txd     ( loop_txd    ),
-    .loop         ( loop        ),
-    .wls          ( wls         ),
-    .pen          ( pen         ),
-    .eps          ( eps         ),
-    .sp           ( sp          ),
+    .pclk            ( pclk         ),
+    .presetn         ( presetn      ),
+    .utrrst          ( urrst        ),
+    .sample_edge     ( sample_edge  ),
+    .voting_edge     ( voting_edge  ),
+    .uart_rxd        ( uart_rxd     ),
+    .loop_txd        ( loop_txd     ),
+    .loop            ( loop         ),
+    .wls             ( wls          ),
+    .pen             ( pen          ),
+    .eps             ( eps          ),
+    .sp              ( sp           ),
     
-    .rsr_data     ( rsr_data    ),
-    .frame_error  ( frame_error ),
-    .parity_error ( parity_error),
-    .error_check  ( error_check ),
-    .receive_done ( receive_done)
+    .rsr_data        ( rsr_data     ),
+    .frame_error     ( frame_error  ),
+    .parity_error    ( parity_error ),
+    .error_check     ( error_check  ),
+    .receive_load_en ( receive_done ),
+    .uart_break      ( uart_break   )
   );
 
 
@@ -146,8 +152,9 @@ module uart_top (
     .dlh              ( dlh             ),
     .dll              ( dll             ),
     
-    .sample_edge      ( sample_edge     ),
-    .transmit_edge    ( transmit_edge   )
+    .sample_edge   ( sample_edge   ),
+    .voting_edge   ( voting_edge   ),
+    .transmit_edge ( transmit_edge )
   );
 
   uart_intpt_gen u_uart_intpt_gen
@@ -160,63 +167,68 @@ module uart_top (
     .dr         ( dr         ),
     .erbi       ( erbi       ),
     
-    .uart_intpt ( uart_intpt ),
+    .uart_intpt ( uart_intpt )
   );
 
    
-   logic thre;
-   logic etbei;
-   logic pe;
-   logic elsi;
-   logic fe;
-   logic dr;
-   logic erbi;
+//   logic thre;
+//   logic etbei;
+//   logic pe;
+//   logic elsi;
+//   logic fe;
+//   logic dr;
+//   logic erbi;
 
   apb_intfc u_apb_intfc (
-   .pclk          ( pclk          ),
-   .presetn       ( presetn       ),
-   .psel          ( psel          ),
-   .pwrite        ( pwrite        ),
-   .penable       ( penable       ),
-   .paddr         ( paddr         ),
-   .pwdata        ( pwdata        ),
+    .pclk          ( pclk          ),
+    .presetn       ( presetn       ),
+    .psel          ( psel          ),
+    .pwrite        ( pwrite        ),
+    .penable       ( penable       ),
+    .paddr         ( paddr         ),
+    .pwdata        ( pwdata        ),
    
-   .rbr           ( rbr           ),
-   .parity_error  ( parity_error  ),
-   .frame_error   ( frame_error   ),
-   .error_check   ( error_check   ),
-   .shift_cnt_eq  ( shift_cnt_eq  ),
-   .rx_fifo_empty ( rx_fifo_empty ),
-   .tsr_load      ( tsr_load      ),
+    .rbr           ( rbr           ),
+    .parity_error  ( parity_error  ),
+    .frame_error   ( frame_error   ),
+    .error_check   ( error_check   ),
+    .shift_cnt_eq  ( shift_cnt_eq  ),
+    .tx_fifo_empty ( tx_fifo_empty ),
+    .rx_fifo_empty ( rx_fifo_empty ),
+    .tsr_load      ( tsr_load      ),
+    .receive_done  ( receive_done  ),
+    .uart_break    ( uart_break    ),
+    .rx_fifo_full  ( rx_fifo_full  ),
+    .rbrf          ( rbrf          ),
+    .uart_intpt    ( uart_intpt    ),
+    .loop          ( loop          ),
+    .thr_wr_en     ( thr_wr_en     ),
+    .rbr_rd_en     ( rbr_rd_en     ),
+    .rxfiftl       ( rxfiftl       ),
+    .txclr         ( txclr         ),
+    .rxclr         ( rxclr         ),
+    .fifoen        ( fifoen        ),
+    .sp            ( sp            ),
+    .eps           ( eps           ),
+    .pen           ( pen           ),
+    .stb           ( stb           ),
+    .wls           ( wls           ),
+    .dll           ( dll           ),
+    .dlh           ( dlh           ),
+    .urrst         ( urrst         ),
+    .utrst         ( utrst         ),
    
-   .loop          ( loop          ),
-   .thr_wr_en     ( thr_wr_en     ),
-   .wbr_rd_en     ( wbr_rd_en     ),
-   .rxfiftl       ( rxfiftl       ),
-   .txclr         ( txclr         ),
-   .rxclr         ( rxclr         ),
-   .fifoen        ( fifoen        ),
-   .sp            ( sp            ),
-   .esp           ( esp           ),
-   .pen           ( pen           ),
-   .stb           ( stb           ),
-   .wls           ( wls           ),
-   .dll           ( dll           ),
-   .dlh           ( dlh           ),
-   .urrst         ( urrst         ),
-   .utrst         ( utrst         ),
    
+    .thre          ( thre          ),
+    .etbei         ( etbei         ),
+    .pe            ( pe            ),
+    .elsi          ( elsi          ),
+    .fe            ( fe            ),
+    .dr            ( dr            ),
+    .erbi          ( erbi          ),
    
-   .thre          ( thre          ),
-   .etbei         ( etbei         ),
-   .pe            ( pe            ),
-   .elsi          ( elsi          ),
-   .fe            ( fe            ),
-   .dr            ( dr            ),
-   .erbi          ( erbi          ),
-   
-   .pready        ( pready        ),
-   .prdata        ( prdata        ),
+    .pready        ( pready        ),
+    .prdata        ( prdata        )
   ); 
 
 endmodule
