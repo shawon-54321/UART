@@ -3,6 +3,7 @@ module receive_frame_detector (
   input  logic presetn,
   input  logic receive_frame_counter_en,
   input  logic receive_frame_counter_clear,
+  input  logic sample_edge,
                      
   output logic receive_done
 ); 
@@ -20,6 +21,6 @@ module receive_frame_detector (
   .count         ( receive_cycle_count        )
   );
 
-  assign receive_done = (receive_cycle_count == 4'd10);
+  assign receive_done = (receive_cycle_count == 4'd10) & sample_edge;
 
 endmodule
