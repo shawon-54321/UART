@@ -1,53 +1,66 @@
-module transmit_fsm (
+module uart_receive_fsm (
   input  logic pclk,
-	input  logic presetn,
-  input  logic utrst,
-  input  logic thre,
-  input  logic shift_cnt_eq,
-  input  logic data_cnt_eq,
-  input  logic pen,
-  input  logic transmit_edge,
-  output logic transmit_clk_clr,
-  output logic shift_en,
-  output logic shift_count_en,
-  output logic shift_count_clr,
-  output logic par,
-  output logic not_op,
-  output logic tsr_load
+  input  logic presetn,
+  input  logic utrrst,       //uart receive enable
+  input  logic uart_rxd,    //uart serial input line
+  input  logic all_zero,
+  input  logic rx_data,
+  input  logic sample_edge,
+  input  logic voting_edge,
+  input  logic receive_done,
+
+  output logic receive_shift_en,
+  output logic voting_shift_en,
+  output logic error_check,
+  output logic receive_frame_counter_en,
+  output logic receive_frame_counter_clear,
+  output logic uart_break,
+  output logic receive_load_en
 );
 
-  parameter STATE_WIDTH = 2;
+  localparam [2:0] IDLE    = 3'b000,
+                   START   = 3'b001,
+                   RECEIVE = 3'b010,
+                   WAIT    = 3'b011,
+                   BREAK   = 3'b100;
 
-  logic [STATE_WIDTH-1:0] pstate,
-                          nstate;
-  
-  localparam  IDLE      = 2'b00,
-              START     = 2'b01,
-              TRANSMIT  = 2'b10,
-              PARITY    = 2'b11;
+  logic [2:0] pstate;
+  logic [2:0] nstate;
 
-  always @(*) begin : NSL
-    case(pstate)
-      IDLE     : nstate[STATE_WIDTH-1:0] = (utrst & ~thre)? START : IDLE ;
-      START    : nstate[STATE_WIDTH-1:0] = (transmit_edge)? TRANSMIT : START;
-      TRANSMIT : nstate[STATE_WIDTH-1:0] = (shift_cnt_eq)? (thre? (transmit_edge? IDLE : TRANSMIT) : (START)) : (data_cnt_eq & transmit_edge & pen)? PARITY : TRANSMIT ;
-      PARITY   : nstate[STATE_WIDTH-1:0] = transmit_edge? TRANSMIT : PARITY; 
-      default  : nstate[STATE_WIDTH-1:0] = 2'bx ; 
+  logic receive_st;
+  logic start_st;
+  logic break_st;
+  logic wait_st;
+
+  assign receive_st  = pstate == RECEIVE;
+  assign start_st    = pstate == START;
+  assign break_st    = pstate == BREAK;
+  assign wait_st     = pstate == WAIT;
+
+  //NSL
+  always@(*)begin
+    casez (pstate)
+      IDLE    : nstate = (utrrst & (~ uart_rxd)) ? START : IDLE;
+      START   : nstate = utrrst ? (sample_edge ? (rx_data ? IDLE : RECEIVE) : START) : IDLE;
+      RECEIVE : nstate = utrrst ? (receive_done ? WAIT : RECEIVE) : IDLE;
+      WAIT    : nstate = all_zero ? (sample_edge ? BREAK : WAIT) : (rx_data ? IDLE : WAIT);
+      BREAK   : nstate = rx_data ? IDLE : BREAK;
     endcase
   end
-  
-  assign transmit_clk_clr = (pstate == IDLE);
-  assign shift_en         = (pstate == TRANSMIT) & (transmit_edge & ~(data_cnt_eq|shift_cnt_eq)) | (pstate == PARITY) & transmit_edge  ;
-  assign shift_count_en   = (pstate == START) & transmit_edge | (pstate == TRANSMIT) & (transmit_edge & ~shift_cnt_eq) | (pstate == PARITY) & transmit_edge ;
-  assign par              = (pstate == PARITY);
-  assign not_op           = (pstate == IDLE) | (pstate == START);
-  assign shift_count_clr  = (pstate == TRANSMIT) & (thre? shift_cnt_eq & transmit_edge : shift_cnt_eq) ;
-  assign tsr_load         = ((pstate == START) | (pstate == TRANSMIT) & shift_cnt_eq) & ~thre ;
 
-  
-  dff #(.RESET_VALUE(IDLE),
-	      .FLOP_WIDTH(STATE_WIDTH)
-  ) u_psr (
+  //OL
+  assign receive_shift_en            = receive_st & sample_edge;
+  assign error_check                 = receive_st & receive_done;
+  assign receive_frame_counter_en    = receive_st & sample_edge;
+  assign receive_frame_counter_clear = ~ receive_st;
+  assign voting_shift_en             = (receive_st | start_st | wait_st | break_st) & voting_edge;
+  assign uart_break                  = break_st & (~ rx_data);
+  assign receive_load_en             = (wait_st & ((~ all_zero) & rx_data)) | (break_st & rx_data); 
+
+  //PSR
+  dff #(
+    .FLOP_WIDTH(3)
+  ) u_dff (
     .clk     ( pclk   ),
     .reset_b ( presetn),
     .d       ( nstate ),

@@ -41,7 +41,17 @@ module buffers(
     logic [3:0]  data_level;                
     logic        fifo_tx_full;
     logic        fifo_tx_empty;
+    logic wr_en_tx_fifo;
+    logic rd_en_tx_fifo; 
+    logic wr_en_rx_fifo;
+    logic rd_en_rx_fifo;
 
+    assign wr_en_tx_fifo = thr_wr_en & fifoen;
+    assign rd_en_tx_fifo = tsr_load & fifoen;
+    assign wr_en_rx_fifo = receive_done & fifoen;
+    assign rd_en_rx_fifo = rbr_rd_en & fifoen;
+
+	
 
   
   
@@ -55,8 +65,8 @@ module buffers(
   ) u_tx_fifo (  
     .clk        ( pclk            ),
     .rst_n      ( presetn         ),
-    .wr_en      ( receive_done & fifoen ),                
-    .rd_en      ( rbr_rd_en & fifoen),                
+    .wr_en      ( wr_en_tx_fifo   ),                
+    .rd_en      ( rd_en_tx_fifo   ),                
     .data_in    ( tx_fifo_data_in ),
     .clear      ( txclr           ),
 
@@ -70,8 +80,8 @@ module buffers(
 
 
 dff #(
-    .FLOP_WIDTH  ( 10             ),
-    .RESET_VALUE ( 10'b0000000000 )
+    .FLOP_WIDTH  ( 8              ),
+    .RESET_VALUE ( 8'b0000000000  )
   )u_thr(  
     .clk         ( pclk           ),
     .reset_b     ( presetn        ),
@@ -107,17 +117,17 @@ dff #(
     .FIFO_DEPTH_LOG(4)
     
   ) u_rx_fifo (  
-    .clk        ( pclk            ),
-    .rst_n      ( presetn         ),
-    .wr_en      ( receive_done & fifoen ),                
-    .rd_en      ( rbr_rd_en & fifoen),                
-    .data_in    ( rx_fifo_data_in ),
-    .clear      ( rxclr           ),
+    .clk        ( pclk               ),
+    .rst_n      ( presetn            ),
+    .wr_en      ( wr_en_rx_fifo      ),                
+    .rd_en      ( rd_en_rx_fifo      ),                
+    .data_in    ( rx_fifo_data_in    ),
+    .clear      ( rxclr              ),
     
-    .data_out   ( fifo_rbr        ),
-    .empty      ( fifo_rx_empty   ),
-    .data_count ( rx_data_cnt     ),
-    .full       ( fifo_rx_full    )
+    .data_out   ( fifo_rbr           ),
+    .empty      ( fifo_rx_empty      ),
+    .data_count ( rx_data_cnt        ),
+    .full       ( fifo_rx_full       )
   );
  
  
