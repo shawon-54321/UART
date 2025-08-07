@@ -78,7 +78,7 @@ module clock_gen(
   assign d_edge_detection[4] = sample_edge_cnt == 4'b1001;    //9th cycle for shift register
 
   //output
-  assign voting_edge    = (~q_edge_detection[0] & d_edge_detection[0]) | (~q_edge_detection[1] & d_edge_detection[1]) | (~q_edge_detection[2] & d_edge_detection[2]);
+  assign voting_edge    = ((~q_edge_detection[0] & d_edge_detection[0]) | (~q_edge_detection[1] & d_edge_detection[1]) | (~q_edge_detection[2] & d_edge_detection[2])) & ~sample_clk_clr;
   assign transmit_edge  = ~q_edge_detection[3] & d_edge_detection[3] & ~transmit_clk_clr;
   assign sample_edge    = ~q_edge_detection[4] & d_edge_detection[4] & ~sample_clk_clr;
 
