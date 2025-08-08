@@ -1,0 +1,401 @@
+
+#
+# Mnemonic Maps
+#
+mmap new -reuse -name {Boolean as Logic} -radix %b -contents {{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}}
+mmap new -reuse -name {Example Map} -radix %x -contents {{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}}
+mmap new -reuse -name {New map} -radix %x -contents {{%b=0 -bgcolor #ffff00 -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label IDLE -linecolor yellow -shape bus}
+{%b=1 -bgcolor #ff00ff -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label START -shape bus}
+{%b=10 -bgcolor #00ff99 -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label RECEIVE -shape bus}
+{%b=11 -bgcolor #9900ff -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label WAIT -shape bus}
+{%b=100 -bgcolor red -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label BREAK -shape bus}}
+mmap new -reuse -name {New map #2} -radix %x -contents {{%b=0 -bgcolor orange -label IDLE -linecolor yellow -shape bus}
+{%b=1 -bgcolor #ff00ff -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label START -shape bus}
+{%b=10 -bgcolor #00ff99 -font -*-courier-medium-r-normal--12-* -label TRANSMIT -shape bus}
+{%b=11 -bgcolor #0099ff -bgstipple gray50 -font -*-courier-medium-r-normal--12-* -label PARITY -shape bus}}
+
+array unset createdGroup
+array set createdGroup {}
+#
+# Groups
+#
+if {[catch {group get -using [list apb]}]} {
+set createdGroup([list apb]) 1
+catch {group new -name apb -overlay 0}
+}
+if {[catch {group get -using [list IER]}]} {
+set createdGroup([list IER]) 1
+catch {group new -name IER -overlay 0}
+}
+if {[catch {group get -using [list FCR]}]} {
+set createdGroup([list FCR]) 1
+catch {group new -name FCR -overlay 0}
+}
+if {[catch {group get -using [list LCR]}]} {
+set createdGroup([list LCR]) 1
+catch {group new -name LCR -overlay 0}
+}
+if {[catch {group get -using [list LSR]}]} {
+set createdGroup([list LSR]) 1
+catch {group new -name LSR -overlay 0}
+}
+if {[catch {group get -using [list PWREMU_MGMT]}]} {
+set createdGroup([list PWREMU_MGMT]) 1
+catch {group new -name PWREMU_MGMT -overlay 0}
+}
+if {[catch {group get -using [list TX Buffer]}]} {
+set createdGroup([list TX Buffer]) 1
+catch {group new -name {TX Buffer} -overlay 0}
+}
+if {[catch {group get -using [list RX Buffer]}]} {
+set createdGroup([list RX Buffer]) 1
+catch {group new -name {RX Buffer} -overlay 0}
+}
+if {[catch {group get -using [list loop rx]}]} {
+set createdGroup([list loop rx]) 1
+catch {group new -name {loop rx} -overlay 0}
+}
+if {[catch {group get -using [list RX]}]} {
+set createdGroup([list RX]) 1
+catch {group new -name RX -overlay 0}
+}
+if {[catch {group get -using [list RECEIVER]}]} {
+set createdGroup([list RECEIVER]) 1
+catch {group new -name RECEIVER -overlay 0}
+}
+if {[catch {group get -using [list TRANSMITTER]}]} {
+set createdGroup([list TRANSMITTER]) 1
+catch {group new -name TRANSMITTER -overlay 0}
+}
+if {[catch {group get -using [list BAUD RATE]}]} {
+set createdGroup([list BAUD RATE]) 1
+catch {group new -name {BAUD RATE} -overlay 0}
+}
+if {[info exists createdGroup([list apb])]} {
+group using apb
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.paddr[31:0]}]} ] \
+    [subst  {[format {tb_uart_top.pwdata[31:0]}]} ] \
+    [subst  {[format {tb_uart_top.pwrite}]} ] \
+    [subst  {[format {tb_uart_top.psel}]} ] \
+    [subst  {[format {tb_uart_top.penable}]} ] \
+    [subst  {[format {tb_uart_top.prdata[31:0]}]} ] \
+    [subst  {[format {tb_uart_top.pready}]} ]
+}
+
+if {[info exists createdGroup([list IER])]} {
+group using IER
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.elsi}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.etbei}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.erbi}]} ]
+}
+
+if {[info exists createdGroup([list FCR])]} {
+group using FCR
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.fifoen}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.rxfiftl[1:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.txclr}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.rxclr}]} ]
+}
+
+if {[info exists createdGroup([list LCR])]} {
+group using LCR
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.wls[1:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.loop}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.bc}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.sp}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.eps}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.pen}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.stb}]} ]
+}
+
+if {[info exists createdGroup([list LSR])]} {
+group using LSR
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.dr}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.oe}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.pe}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.fe}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.bi}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.thre}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.temt}]} ]
+}
+
+if {[info exists createdGroup([list PWREMU_MGMT])]} {
+group using PWREMU_MGMT
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.urrst}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_apb_intfc.utrst}]} ]
+}
+
+if {[info exists createdGroup([list TX Buffer])]} {
+group using {TX Buffer}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.tx_data[7:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.fifo_tx_data[7:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.thr_data[7:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.tx_fifo_full}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.tx_fifo_empty}]} ]
+}
+
+if {[info exists createdGroup([list RX Buffer])]} {
+group using {RX Buffer}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.rbr[10:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.rsr_data[7:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.rx_fifo_full}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.rx_fifo_empty}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.fifo_rbr[10:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_buffers.just_rbr[10:0]}]} ]
+}
+
+if {[info exists createdGroup([list loop rx])]} {
+group using {loop rx}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.loop}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.voting_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.sample_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.loop_txd}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.rx_data}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_shift_en}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receiver_shift_block.shift_reg_out[9:0]}]} ]
+}
+
+if {[info exists createdGroup([list RX])]} {
+group using RX
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.uart_rxd}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.voting_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.sample_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.rx_data}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_shift_en}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receiver_shift_block.shift_reg_out[9:0]}]} ]
+}
+
+if {[info exists createdGroup([list RECEIVER])]} {
+group using RECEIVER
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.pstate[2:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.sample_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.rx_data}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.utrrst}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.uart_break}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_done}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_load_en}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.error_check}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.all_zero}]} ] \
+    RX \
+    {loop rx}
+}
+
+if {[info exists createdGroup([list TRANSMITTER])]} {
+group using TRANSMITTER
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.uart_txd}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.loop_txd}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.shift_cnt_eq}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.tsr_load}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.transmit_clk_clr}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_uart_transmitter.u_tx_fsm.pstate[1:0]}]} ]
+}
+
+if {[info exists createdGroup([list BAUD RATE])]} {
+group using {BAUD RATE}
+group set -overlay 0
+group set -comment {}
+group clear 0 end
+group insert \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.sample_edge_cnt[3:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.transmit_edge_cnt[3:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.voting_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.transmit_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.sample_edge}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.dll[7:0]}]} ] \
+    [subst  {[format {tb_uart_top.u_uart_top.u_clock_gen.dlh[7:0]}]} ]
+}
+
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.pclk}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.presetn}]}
+	} ]]
+set id [waveform add -cdivider divider]
+
+set groupId0 [waveform add -groups apb]
+waveform hierarchy collapse $groupId0
+
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.uart_intpt}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.uart_rxd}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.uart_txd}]}
+	} ]]
+set id [waveform add -cdivider divider]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.u_uart_top.u_apb_intfc.rbr[10:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.u_uart_top.u_apb_intfc.dlh[7:0]}]}
+	} ]]
+set id [waveform add -signals [subst  {
+	{[format {tb_uart_top.u_uart_top.u_apb_intfc.dll[7:0]}]}
+	} ]]
+
+set groupId0 [waveform add -groups IER]
+
+
+set groupId0 [waveform add -groups FCR]
+
+
+set groupId0 [waveform add -groups LCR]
+
+
+set groupId0 [waveform add -groups LSR]
+
+
+set groupId0 [waveform add -groups PWREMU_MGMT]
+
+set id [waveform add -cdivider divider]
+
+set groupId0 [waveform add -groups {{TX Buffer}}]
+waveform hierarchy collapse $groupId0
+
+
+set groupId0 [waveform add -groups {{RX Buffer}}]
+waveform hierarchy collapse $groupId0
+
+set id [waveform add -cdivider divider]
+
+set groupId0 [waveform add -groups RECEIVER]
+
+set groupId1 [waveform find -name RX]
+waveform hierarchy collapse $groupId1
+
+
+set groupId1 [waveform find -name {loop rx}]
+waveform hierarchy collapse $groupId1
+
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.pstate[2:0]}]} {-radix {New map}}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.sample_edge}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.rx_data}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.utrrst}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.uart_break}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_done}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.receive_load_en}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.error_check}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_receive_top.u_uart_receive_fsm.all_zero}]} {}
+}] childcmds {
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format path $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+
+set id [waveform add -cdivider divider]
+
+set groupId0 [waveform add -groups TRANSMITTER]
+set gpGlist0 [waveform hierarchy contents $groupId0]
+set gpID0 [lindex $gpGlist0 0]
+foreach {name attrs} [subst  {
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.uart_txd}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.loop_txd}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.shift_cnt_eq}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.tsr_load}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.transmit_clk_clr}]} {}
+    {[format {tb_uart_top.u_uart_top.u_uart_transmitter.u_tx_fsm.pstate[1:0]}]} {-radix {New map #2}}
+}] childcmds {
+    {}
+    {}
+    {}
+    {}
+    {}
+    {}
+} {
+    set expected [ join [waveform signals -format path $gpID0] ]
+    if {[string equal $name $expected] || $name == "cdivider"} {
+        if {$attrs != ""} {
+            eval waveform format $gpID0 $attrs
+        }
+        if { $childcmds != ""} {
+            eval $childcmds
+        }
+    }
+    set gpGlist0 [lrange $gpGlist0 1 end]
+    set gpID0 [lindex $gpGlist0 0]
+}
+
+set id [waveform add -cdivider divider]
+
+set groupId0 [waveform add -groups {{BAUD RATE}}]
+waveform hierarchy collapse $groupId0
+
+
+waveform xview limits 0 105000ps
