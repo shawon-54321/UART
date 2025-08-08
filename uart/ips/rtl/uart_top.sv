@@ -62,6 +62,7 @@ module uart_top (
     .txclr         ( txclr         ),
     .rxclr         ( rxclr         ),
     .rxfiftl       ( rxfiftl       ),
+    .dr            ( dr            ),
     
     
     .tx_data       ( tx_data       ),
