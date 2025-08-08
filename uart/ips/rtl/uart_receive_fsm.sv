@@ -40,7 +40,7 @@ module uart_receive_fsm (
   //NSL
   always@(*)begin
     casez (pstate)
-      IDLE    : nstate = (utrrst & (~ uart_rxd)) ? START : IDLE;
+      IDLE    : nstate = (utrrst) ? START : IDLE;
       START   : nstate = utrrst ? (sample_edge ? (rx_data ? IDLE : RECEIVE) : START) : IDLE;
       RECEIVE : nstate = utrrst ? (receive_done ? WAIT : RECEIVE) : IDLE;
       WAIT    : nstate = all_zero ? (sample_edge ? BREAK : WAIT) : (rx_data ? IDLE : WAIT);
@@ -50,12 +50,14 @@ module uart_receive_fsm (
 
   //OL
   assign receive_shift_en            = receive_st & sample_edge;
-  assign error_check                 = receive_st & receive_done;
+  //assign error_check                 = receive_st & receive_done;
+  assign error_check                 = (wait_st & (~ all_zero & rx_data)) | (break_st & rx_data); 
   assign receive_frame_counter_en    = receive_st & sample_edge;
   assign receive_frame_counter_clear = ~ receive_st;
   assign voting_shift_en             = (receive_st | start_st | wait_st | break_st) & voting_edge;
   assign uart_break                  = break_st & (~ rx_data);
-  assign receive_load_en             = (receive_st & (utrrst & receive_done)) | (break_st & rx_data); 
+  //assign receive_load_en             = (receive_st & (utrrst & receive_done)) | (break_st & rx_data); 
+  assign receive_load_en             = (wait_st & (~ all_zero & rx_data)) | (break_st & rx_data); 
 
   //PSR
   dff #(

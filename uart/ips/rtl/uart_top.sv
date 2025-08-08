@@ -35,12 +35,13 @@ module uart_top (
     logic        tx_fifo_empty;
     logic        rx_fifo_empty;
                  
+    logic        bi;    
     logic        below_level;
     logic        frame_error;
     logic        parity_error;
     logic        receive_done;
     logic        rbrf;
-    logic       uart_break;
+    logic        uart_break;
 
 
   buffers u_buffers (
@@ -159,13 +160,15 @@ module uart_top (
 
   uart_intpt_gen u_uart_intpt_gen
   (
-    .thre       ( thre       ),
-    .etbei      ( etbei      ),
-    .pe         ( pe         ),
-    .elsi       ( elsi       ),
-    .fe         ( fe         ),
-    .dr         ( dr         ),
-    .erbi       ( erbi       ),
+    .thre        ( thre        ),
+    .etbei       ( etbei       ),
+    .pe          ( pe          ),
+    .elsi        ( elsi        ),
+    .bi          ( bi          ),
+    .fe          ( fe          ),
+    .dr          ( dr          ),
+    .erbi        ( erbi        ),
+    .below_level ( below_level ),
     
     .uart_intpt ( uart_intpt )
   );
@@ -223,6 +226,7 @@ module uart_top (
     .etbei         ( etbei         ),
     .pe            ( pe            ),
     .elsi          ( elsi          ),
+    .bi            ( bi            ),
     .fe            ( fe            ),
     .dr            ( dr            ),
     .erbi          ( erbi          ),

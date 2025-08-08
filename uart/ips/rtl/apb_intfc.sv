@@ -44,6 +44,7 @@ module apb_intfc(
   output logic        pe,
   output logic        elsi,
   output logic        fe,
+  output logic        bi,
   output logic        dr,
   output logic        erbi,
                       
@@ -164,9 +165,9 @@ module apb_intfc(
   logic oe_st_d;
   logic rxfifoe_st_d;
   //logic pe;
-  //logic fe;
+  //logic bi;
   logic temt;
-  //logic dr;
+  logic oe;
 
   logic paddr_eq_rbr_thr;
 
@@ -181,8 +182,8 @@ module apb_intfc(
   assign de_st_d          = fifoen ? ~rx_fifo_empty : ((receive_done | dr) & ( ~ (rd_en & paddr_eq_rbr_thr)));
   assign thre_st_d        = ~thr_wr_en & ((~fifoen & tsr_load) | ((fifoen & tx_fifo_empty) | thre));
   assign temt_st_d        = shift_cnt_eq ? thre : temt;
-  assign bi_st_d          = fifoen ? (rbr[10] & ( ~ (rd_en & paddr_eq_rbr_thr))) : (uart_break & ( ~ (rd_en & paddr_eq_rbr_thr)));
-  assign oe_st_d          = fifoen ? (rx_fifo_full & receive_done) : (rbrf & receive_done);
+  assign bi_st_d          = fifoen ? (rbr[10] & ( ~ (rd_en & paddr_eq_rbr_thr))) : ((uart_break | bi) & ( ~ (rd_en & paddr_eq_rbr_thr)));
+  assign oe_st_d          = fifoen ? (((rx_fifo_full & receive_done) | oe) & (~ (rd_en & paddr_eq_rbr_thr))) : (rbrf & receive_done);
   assign rxfifoe_st_d     = |(lsr_d[4:0]);
 
 
@@ -190,6 +191,8 @@ module apb_intfc(
 
 
   assign lsr_d = {temt_st_d, thre_st_d, bi_st_d, frame_st_d, parity_st_d, oe_st_d ,de_st_d};
+  assign bi    = lsr_q[4];
+  assign oe    = lsr_q[1];
   assign pe    = lsr_q[2];
   assign fe    = lsr_q[3];
   assign temt  = lsr_q[6];
@@ -198,8 +201,8 @@ module apb_intfc(
   
   
   dff #(
-   .RESET_VALUE ( 8'b01100000),
-   .FLOP_WIDTH  ( 8       )
+   .RESET_VALUE ( 7'b1100000),
+   .FLOP_WIDTH  ( 7       )
   )u_lsr(
    .clk         ( pclk    ),
    .reset_b     ( presetn ),

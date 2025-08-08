@@ -14,7 +14,7 @@ module parity_checker (
   logic parity_match;
 
   assign computed_parity = ^ rsr_data;
-  assign expected_parity = sp ? ~ eps : (eps ? ~computed_parity : computed_parity);
+  assign expected_parity = sp ? ~ eps : (eps ? computed_parity : ~ computed_parity);
   assign parity_match    = (received_parity == expected_parity);
   assign parity_error    = pen & (~parity_match);
 

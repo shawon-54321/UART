@@ -88,7 +88,7 @@ module uart_receiver_shift_block (
 
   assign rsr_data        = pen ? data_with_parity : data_without_parity;
   assign received_parity = shift_reg_out[8];
-  assign frame_error     = (error_check  & (~ shift_reg_out[0]));
+  assign frame_error     = (error_check  & (~ shift_reg_out[9]));
   assign all_zero        = ~ (| shift_reg_out);
 
 endmodule

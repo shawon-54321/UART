@@ -68,6 +68,8 @@ module uart_receiver_top (
     .receive_frame_counter_en    ( receive_frame_counter_en   ),
     .receive_frame_counter_clear ( receive_frame_counter_clear),
     .sample_edge                 ( sample_edge                ),
+    .wls                         ( wls                        ),
+    .pen                         ( pen                        ),
     
     .receive_done                ( receive_done               )
   );
