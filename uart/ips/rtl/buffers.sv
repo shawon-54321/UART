@@ -17,6 +17,7 @@ module buffers(
   input  logic        txclr,
   input  logic        rxclr,
   input  logic [1:0]  rxfiftl,
+  input  logic        dr,
                       
                       
   output logic [7:0]  tx_data,
@@ -163,7 +164,7 @@ dff #(
     .q       ( rbrf     )
   );   
 
-  assign rbr[10:0] = fifoen ? fifo_rbr[10:0] : just_rbr[10:0];
+  assign rbr[10:0] = fifoen ?  (dr ? fifo_rbr[10:0] : 11'b0) : just_rbr[10:0];
   
   // Level Detection
   always @(*) begin
