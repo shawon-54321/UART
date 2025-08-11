@@ -149,6 +149,9 @@ module apb_intfc(
   wire [7:0] lsr_d;
   reg [7:0] lsr_q;
 
+  wire temt;
+  wire oe;
+
   assign rbr_rd_en = (paddr_eq_rbr_thr & rd_en);
   assign paddr_eq_rbr_thr = (paddr[7:0] == 8'b0);
 
@@ -161,6 +164,8 @@ module apb_intfc(
   assign bi_st_d          = fifoen ? (rbr[10] & ( ~ (rd_en & paddr_eq_rbr_thr))) : ((uart_break | bi) & ( ~ (rd_en & paddr_eq_rbr_thr)));
   assign oe_st_d          = fifoen ? (((rx_fifo_full & receive_done) | oe) & (~ (rd_en & paddr_eq_rbr_thr))) : (rbrf & receive_done);
   assign rxfifoe_st_d     = |(lsr_d[4:0]);
+
+
 
 
   assign lsr_d = {temt_st_d, thre_st_d, bi_st_d, frame_st_d, parity_st_d, oe_st_d ,de_st_d};
@@ -183,12 +188,28 @@ module apb_intfc(
   wire [7:0] dll_d;
 
   assign dll_d = dll_wr_en ? pwdata[7:0] : dll;
-
+  dff #(
+   .RESET_VALUE ( 1'b0    ),
+   .FLOP_WIDTH  ( 8       )
+  )u_dll(
+   .clk         ( pclk    ),
+   .reset_b     ( presetn ),
+   .d           ( dll_d   ),
+   .q           ( dll     )
+  );
   // DLH
   wire [7:0] dlh_d;
 
   assign dlh_d = dlh_wr_en ? pwdata[7:0] : dlh;
-
+  dff #(
+   .RESET_VALUE ( 1'b0    ),
+   .FLOP_WIDTH  ( 8       )
+  )u_dlh(
+   .clk         ( pclk    ),
+   .reset_b     ( presetn ),
+   .d           ( dlh_d   ),
+   .q           ( dlh     )
+  );
   // Power and emulation
   reg [1:0] pwr_d;
   reg [1:0] pwr_q;

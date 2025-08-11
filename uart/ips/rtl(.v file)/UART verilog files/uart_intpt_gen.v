@@ -12,17 +12,15 @@ module uart_intpt_gen(
     output uart_intpt
 );
     
-  reg thre_int;
-  reg rx_line_st_int;
-  reg dr_int;
+  wire thre_int;
+  wire rx_line_st_int;
+  wire dr_int;
 
   // Interrupt logic
-  always @(*) begin
-    thre_int       = thre & etbei;
-    rx_line_st_int = (pe | fe | bi) & elsi;
-    dr_int         = dr & erbi & ~below_level;
-  end
+  assign thre_int       = thre & etbei;
+  assign rx_line_st_int = (pe|fe|bi)& elsi;
+  assign dr_int         = dr & erbi & ~below_level;
 
-  assign uart_intpt = thre_int | rx_line_st_int | dr_int;
+  assign uart_intpt = thre_int | rx_line_st_int | dr_int ;
 
 endmodule

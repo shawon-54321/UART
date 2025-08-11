@@ -8,15 +8,14 @@ module parity_checker (
   output       parity_error
 );
 
-  reg computed_parity;
-  reg expected_parity;
-  reg parity_match;
+  wire computed_parity;
+  wire expected_parity;
+  wire parity_match;
 
-  always @(*) begin
-    computed_parity = ^rsr_data;
-    expected_parity = sp ? ~eps : (eps ? computed_parity : ~computed_parity);
-    parity_match = (received_parity == expected_parity);
-  end
+  assign computed_parity = ^ rsr_data;
+  assign expected_parity = sp ? ~ eps : (eps ? computed_parity : ~ computed_parity);
+  assign parity_match    = (received_parity == expected_parity);
+  assign parity_error    = pen & (~parity_match);
   
   assign parity_error = pen & (~parity_match);
 

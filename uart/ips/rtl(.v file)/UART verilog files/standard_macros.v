@@ -418,43 +418,6 @@ module register #(
 
 endmodule
 
-// Two Flop Synchronizer----------
-module two_flop_sync (
-
-  input wire clk,
-  input wire reset_b,
-  input wire in,
-  
-  output reg out
-  
-);
-  
-  wire q1;
-
-  dff #(                      
-    .FLOP_WIDTH ( 1     ),
-    .RESET_VALUE( 1'b0 )
-  )u1(  
-    .clk     ( clk     ),
-    .reset_b ( reset_b ),
-    .d       ( in      ),
-    .q       ( q1      )
-  );
-   
-  dff #(                      
-    .FLOP_WIDTH ( 1     ),
-    .RESET_VALUE( 1'b0 )
-  )u2(  
-    .clk     ( clk     ),
-    .reset_b ( reset_b ),
-    .d       ( q1      ),
-    .q       ( out      )
-    
-  );   
-
-
-endmodule
-
 
 
 
